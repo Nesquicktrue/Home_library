@@ -11,33 +11,33 @@
     <title>Knihovna</title>
 </head>
 <body>
-    <div class="wrapper">
+    <div class="container">
         <div class="uvod">
             <h1>Domácí knihovnička</h1>
         </div>
         
-        <div class="plus"><button id="plusTlac" class="btn">+</button></div>
+        <div class="container" style="position: relative;"><button id="plusTlac" class="btn btn-primary">+</button></div>
 
-        <div id="pridejForm" class="neviditelny" >
+        <div id="pridejForm" class="neviditelny form" >
             <form class="form">
-                <label>Název knihy:</label>
-                <input type="text" id="nazev" >
-                <label>Autor:</label>
-                <input type="text" id="autor">
-                <label>Počet stran:</label>
-                <input type="number" id="stran">
-                <label>Již přečteno?</label>
-                <input type="checkbox" value="off" id="precteno">
-                <label>Hodnoceni</label>
+                <!-- <label for="nazev">Název knihy:</label> -->
+                <input class="form-control" type="text" id="nazev" placeholder="Název knihy">
+                <!-- <label for="autor">Autor:</label> -->
+                <input class="form-control" type="text" id="autor" placeholder="Autor">
+                <!-- <label for="stran">Počet stran:</label> -->
+                <input class="form-control" type="number" id="stran" placeholder="Počet stran">
+                <label for="precteno">Již přečteno?</label>
+                <input class="form-check" type="checkbox" value="off" id="precteno">
+                <!-- <label for="Hodnoceni">Hodnoceni</label> -->
                 <div class="my-rating"></div>
-                <label>Recenze</label>
-                <textarea id="recenze" rows="4" cols="50"></textarea>
+                <!-- <label for="recenze">Recenze</label> -->
+                <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
                 <input type="submit" class="submit">
             </form>
         </div>
         <div class="vypis"></div>
-            <input id="filtr" type="text" placeholder="Hledej název, či autora..." >
-            <table class="table table-hover">
+            <input id="filtr" type="text" class="form-control mb-1" placeholder="Hledej název, či autora..." >
+            <table class="table table-hover table-dark">
                 <thead>
                     <th scope="col" clas="bg-info" data-colname="nazev" data-order="desc">Název knihy &#9650</th>
                     <th scope="col" data-colname="autor" data-order="desc">Autor &#9650</th>
@@ -56,6 +56,22 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="js/jquery.star-rating-svg.js"> </script>
     <script type="module" src="js/main.js"></script>
+
+    <!-- Řazení v rámci tabulek: -->
+    <!-- <script>
+    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    Array.from(tbody.querySelectorAll('tr'))
+      .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+      .forEach(tr => tbody.appendChild(tr) );
+    })));
+    </script> -->
 
 </body>
 </html>

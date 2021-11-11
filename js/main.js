@@ -62,24 +62,10 @@ plusTlac.addEventListener("click", () => {pridejForm.classList.toggle("neviditel
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
-    // zkontrolujAZadej();
     posliDoDatabaze();
     vyprazdniPole();
     naplnSeznamKnihzDB();
-
 });
-
-// function zkontrolujAZadej () {
-//     if (inputNazev.value != "") {
-//         pridejKnihu (inputNazev.value, inputAutor.value, inputStran.value, inputPrecteno.checked,
-//             inputHodnoceni.starRating('getRating'), inputRecenze.value)
-        
-//         console.log("Kniha byla úspěšně přidána!");
-//         // dejVsechnyJednou()
-//     } else {
-//         console.log("Zadej povinné údaje")
-//     }
-// };
 
 function vyprazdniPole () {
     inputNazev.value = "";
@@ -88,11 +74,6 @@ function vyprazdniPole () {
     inputRecenze.value = "";
     inputPrecteno.checked = false;
 };
-
-// function pridejKnihu (nazev, autor, pocetStranek, precteno, hodnoceni, recenze) {
-//     let novaKniha = new Kniha (nazev, autor, pocetStranek, precteno, hodnoceni, recenze)
-//     knihovna.push(novaKniha);
-// };
 
 function jePrecteno (co) {
     if (co.precteno === true) {
@@ -103,7 +84,7 @@ function jePrecteno (co) {
 }
 
 function posliDoDatabaze () {
-    set(ref(db, "Users/" + "Admin/" + 3),{
+    set(ref(db, "Users/" + "Admin/" + 5),{
         nazevKnihy: inputNazev.value,
         autor: inputAutor.value,
         stran: inputStran.value,
@@ -116,9 +97,11 @@ function posliDoDatabaze () {
 //  ------------- Vypis knih - Tabulka ------------- 
 let knihy=[];
 let idKnihy;
+const table = document.getElementById('myTable')
 naplnSeznamKnihzDB();  // načtu z DB knihy do array knihy[];
 
 function naplnSeznamKnihzDB(){
+    table.innerHTML = ''
     const dbRef = ref(db);
 
     get(child(dbRef,"Users/Admin"))
@@ -132,7 +115,7 @@ function naplnSeznamKnihzDB(){
 }
 
 function buildTable(data){
-    let table = document.getElementById('myTable')
+    // let table = document.getElementById('myTable')
     table.innerHTML = ''
     for (let i = 0; i < data.length; i++){
  
@@ -148,6 +131,7 @@ function buildTable(data){
     }
  }
 //  ------------- Filtrování knih v tabulce ------------- 
+
 const inputFilter = document.getElementById("filtr");
 inputFilter.addEventListener("keyup", () => {
     let filtrUdaj = inputFilter.value;
@@ -170,23 +154,18 @@ function filtrujTabulku(filtrUdaj, knihy) {
 }
 
 //  ------------- Řazení knih v tabulce ------------- 
-$('th').on('click', function(){
-    let column = $(this).data('colname')
-    let order = $(this).data('order')
-    let text = $(this).html()
-    text = text.substring(0, text.length - 1);
-    if (order == 'desc'){
-       knihyFiltr = knihyFiltr.sort((a, b) => a[column] > b[column] ? 1 : -1)
-       $(this).data("order","asc");
-       text += '&#9660'
-    }else{
-       knihyFiltr = knihyFiltr.sort((a, b) => a[column] < b[column] ? 1 : -1)
-       $(this).data("order","desc");
-       text += '&#9650'
-    }
 
-   $(this).html(text)
-   buildTable(knihyFiltr)
-})
-   
+const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+)(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    Array.from(tbody.querySelectorAll('tr'))
+        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+        .forEach(tr => tbody.appendChild(tr) );
+})));
+
 
