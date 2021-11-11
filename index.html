@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/script.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/star-rating-svg.css">
+    
+
     <title>Knihovna</title>
 </head>
 <body>
@@ -13,8 +15,10 @@
         <div class="uvod">
             <h1>Domácí knihovnička</h1>
         </div>
+        
+        <div class="plus"><button id="plusTlac" class="btn">+</button></div>
 
-        <div class="pridej">Přidat
+        <div id="pridejForm" class="neviditelny" >
             <form class="form">
                 <label>Název knihy:</label>
                 <input type="text" id="nazev" >
@@ -24,12 +28,32 @@
                 <input type="number" id="stran">
                 <label>Již přečteno?</label>
                 <input type="checkbox" value="off" id="precteno">
+                <label>Hodnoceni</label>
+                <div class="my-rating"></div>
+                <label>Recenze</label>
+                <textarea id="recenze" rows="4" cols="50"></textarea>
                 <input type="submit" class="submit">
             </form>
         </div>
         <div class="vypis"></div>
-    </div>
+            <table class="table table-hover">
+                <thead>
+                    <th scope="col" clas="bg-info" data-colname="nazev" data-order="desc">Název knihy &#9650</th>
+                    <th scope="col" data-colname="autor" data-order="desc">Autor &#9650</th>
+                    <th scope="col" data-colname="stran" data-order="desc">Stran &#9650</th>
+                    <th scope="col" data-colname="rating" data-order="desc">Hodnocení &#9650</th>
+                    <th scope="col" data-colname="recenze" data-order="desc">Recenze &#9650</th>
+                    <th scope="col" data-colname="rating" data-order="desc">place &#9650</th>
+                </thead>
+                <tbody id="myTable" >
 
-    
+                </tbody>
+            </table>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script><script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="js/jquery.star-rating-svg.js"> </script>
+    <script type="module" src="js/script.js"></script>
+
 </body>
 </html>
