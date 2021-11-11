@@ -28,6 +28,7 @@ const form = document.querySelector("form");
 const plusTlac = document.getElementById("plusTlac");
 const pridejForm = document.getElementById("pridejForm");
 let knihovna = [];
+let knihyFiltr = [];
 
 const inputHodnoceni = $(".my-rating").starRating({
     starSize: 25,
@@ -61,22 +62,24 @@ plusTlac.addEventListener("click", () => {pridejForm.classList.toggle("neviditel
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
-    zkontrolujAZadej();
+    // zkontrolujAZadej();
     posliDoDatabaze();
     vyprazdniPole();
+    naplnSeznamKnihzDB();
+
 });
 
-function zkontrolujAZadej () {
-    if (inputNazev.value != "") {
-        pridejKnihu (inputNazev.value, inputAutor.value, inputStran.value, inputPrecteno.checked,
-            inputHodnoceni.starRating('getRating'), inputRecenze.value)
+// function zkontrolujAZadej () {
+//     if (inputNazev.value != "") {
+//         pridejKnihu (inputNazev.value, inputAutor.value, inputStran.value, inputPrecteno.checked,
+//             inputHodnoceni.starRating('getRating'), inputRecenze.value)
         
-        console.log("Kniha byla úspěšně přidána!");
-        dejVsechnyJednou()
-    } else {
-        console.log("Zadej povinné údaje")
-    }
-};
+//         console.log("Kniha byla úspěšně přidána!");
+//         // dejVsechnyJednou()
+//     } else {
+//         console.log("Zadej povinné údaje")
+//     }
+// };
 
 function vyprazdniPole () {
     inputNazev.value = "";
@@ -86,10 +89,10 @@ function vyprazdniPole () {
     inputPrecteno.checked = false;
 };
 
-function pridejKnihu (nazev, autor, pocetStranek, precteno, hodnoceni, recenze) {
-    let novaKniha = new Kniha (nazev, autor, pocetStranek, precteno, hodnoceni, recenze)
-    knihovna.push(novaKniha);
-};
+// function pridejKnihu (nazev, autor, pocetStranek, precteno, hodnoceni, recenze) {
+//     let novaKniha = new Kniha (nazev, autor, pocetStranek, precteno, hodnoceni, recenze)
+//     knihovna.push(novaKniha);
+// };
 
 function jePrecteno (co) {
     if (co.precteno === true) {
@@ -112,8 +115,8 @@ function posliDoDatabaze () {
 
 //  ------------- Vypis knih - Tabulka ------------- 
 let knihy=[];
+let idKnihy;
 naplnSeznamKnihzDB();  // načtu z DB knihy do array knihy[];
-buildTable(knihy);
 
 function naplnSeznamKnihzDB(){
     const dbRef = ref(db);
@@ -124,44 +127,66 @@ function naplnSeznamKnihzDB(){
             knihy.push(childSnapshot.val());
         })
         console.log(knihy)
+        buildTable(knihy)
     })
 }
 
+function buildTable(data){
+    let table = document.getElementById('myTable')
+    table.innerHTML = ''
+    for (let i = 0; i < data.length; i++){
+ 
+        let row = `<tr>
+                        <td>${data[i].nazevKnihy}</td>
+                        <td>${data[i].autor}</td>
+                        <td>${data[i].stran}</td>
+                        <td>${data[i].rating}</td>
+                        <td>${data[i].recenze}</td>
+                        <td>${data[i].rating}</td>
+                   </tr>`
+        table.innerHTML += row
+    }
+ }
+//  ------------- Filtrování knih v tabulce ------------- 
+const inputFilter = document.getElementById("filtr");
+inputFilter.addEventListener("keyup", () => {
+    let filtrUdaj = inputFilter.value;
+    let data = filtrujTabulku(filtrUdaj, knihy)
+    buildTable(data)
+})
+
+function filtrujTabulku(filtrUdaj, knihy) {
+        knihyFiltr = [];
+    for (let i=0; i < knihy.length; i++){
+        filtrUdaj = filtrUdaj.toLowerCase();
+        let nazev = knihy[i].nazevKnihy.toLowerCase();
+        let autor = knihy[i].autor.toLowerCase();
+
+        if ( nazev.includes(filtrUdaj) || autor.includes(filtrUdaj) ){
+            knihyFiltr.push(knihy[i])
+        }
+    }
+    return knihyFiltr
+}
+
+//  ------------- Řazení knih v tabulce ------------- 
 $('th').on('click', function(){
     let column = $(this).data('colname')
     let order = $(this).data('order')
     let text = $(this).html()
     text = text.substring(0, text.length - 1);
     if (order == 'desc'){
-       knihy = knihy.sort((a, b) => a[column] > b[column] ? 1 : -1)
+       knihyFiltr = knihyFiltr.sort((a, b) => a[column] > b[column] ? 1 : -1)
        $(this).data("order","asc");
        text += '&#9660'
     }else{
-       knihy = knihy.sort((a, b) => a[column] < b[column] ? 1 : -1)
+       knihyFiltr = knihyFiltr.sort((a, b) => a[column] < b[column] ? 1 : -1)
        $(this).data("order","desc");
        text += '&#9650'
     }
 
    $(this).html(text)
-   buildTable(knihy)
+   buildTable(knihyFiltr)
 })
    
-function buildTable(data){
-   let table = document.getElementById('myTable')
-   table.innerHTML = ''
-   for (let i = 0; i < data.length; i++){
-    //    let nazev = `nazev-${i}`
-    //    let autor = `autor-${i}`
-    //    let stran = `stran-${i}`
 
-       let row = `<tr>
-                       <td>${data[i].nazevKnihy}</td>
-                       <td>${data[i].autor}</td>
-                       <td>${data[i].stran}</td>
-                       <td>${data[i].rating}</td>
-                       <td>${data[i].recenze}</td>
-                       <td>${data[i].rating}</td>
-                  </tr>`
-       table.innerHTML += row
-   }
-}
