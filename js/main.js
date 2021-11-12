@@ -96,7 +96,7 @@ function posliDoDatabaze () {
 
 //  ------------- Vypis knih - Tabulka ------------- 
 let knihy=[];
-let idKnihy;
+
 const table = document.getElementById('myTable')
 naplnSeznamKnihzDB();  // načtu z DB knihy do array knihy[];
 
@@ -115,7 +115,6 @@ function naplnSeznamKnihzDB(){
 }
 
 function buildTable(data){
-    // let table = document.getElementById('myTable')
     table.innerHTML = ''
     for (let i = 0; i < data.length; i++){
  
@@ -159,13 +158,20 @@ const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx]
 const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
         v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
 )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-
+let predchoziStav;
 document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
     const table = th.closest('table');
     const tbody = table.querySelector('tbody');
+    let vybrano = document.querySelector(".bg-info"); // přepínání barvy filtrovaného sloupce
+    vybrano.classList.toggle("bg-info");
     Array.from(tbody.querySelectorAll('tr'))
         .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
         .forEach(tr => tbody.appendChild(tr) );
+        if (window.asc === true) {
+            th.classList.toggle("bg-info");
+        } else {
+            th.classList.toggle("bg-info");
+        }   
 })));
 
 

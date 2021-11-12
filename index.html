@@ -4,10 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Přihlášení</title>
+    <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.js"></script>
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.css" />
 </head>
 <body>
-  
+    <h1>Knihovnička</h1>
+    <div id="loginUI">
+    <div id="loader">Načítám...</div>    
+    </div>
+    <!-- <div id="not-logged">
+        <form onsubmit="login(event)">
+            <input type="text" id="email" placeholder="email">
+            <input type="text" id="password" placeholder="password">
+            <button type="submit">Přihlásit</button>
+        </form>
+    </div>
+
+    <div class="logged">
+        <h3> Jste již přihlášen</h3>
+    </div> -->
+<script type="text/javascript" src="js/index.js"></script>
 </body>
 </html>
