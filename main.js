@@ -1,22 +1,56 @@
-//  ------------- inicializace Databaze ------------- 
 
+// --------- Inicializace DB ---------
+let firebaseConfig = {
+    apiKey: "AIzaSyB5TZnqd4Lwel74yhtYNaHfOjsfgWIJF_4",
+    authDomain: "home-library-js.firebaseapp.com",
+    databaseURL: "https://home-library-js-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "home-library-js",
+    storageBucket: "home-library-js.appspot.com",
+    messagingSenderId: "109962970996",
+    appId: "1:109962970996:web:2317b678700fc00da40e21"
+};
+firebase.initializeApp(firebaseConfig);
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
-    const firebaseConfig = {
-        apiKey: "AIzaSyB5TZnqd4Lwel74yhtYNaHfOjsfgWIJF_4",
-        authDomain: "home-library-js.firebaseapp.com",
-        databaseURL: "https://home-library-js-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "home-library-js",
-        storageBucket: "home-library-js.appspot.com",
-        messagingSenderId: "109962970996",
-        appId: "1:109962970996:web:2317b678700fc00da40e21"
-    };
-
-    const app = initializeApp(firebaseConfig);
-        
+const app = initializeApp(firebaseConfig);
 import {getDatabase, get, ref, set, child, update, remove}
     from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
-    
-const db = getDatabase();
+    const db = getDatabase();  
+
+// --------- Inicializace DB ---------
+let mainApp = {};
+let mainContainer = document.getElementById("main_container");
+
+const tlacOdhlasit = document.getElementById("logout")
+tlacOdhlasit.addEventListener("click", () => {
+    firebase.auth().signOut().then(function(){
+    console.log("Odhlášeno");
+    window.location.replace("login.html");
+    })
+})
+
+let init = function(){
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          console.log("Úspěšně přihlášeno");
+          mainContainer.style.display = "";
+          console.log("Uživatel: " + firebase.auth().X)
+        } else {
+          // No user is signed in.
+          mainContainer.style.display = "none";
+          console.warn("Nepřihlášen!");
+          window.location.replace("login.html");
+        }
+      });
+}
+ 
+
+init();
+
+mainApp.logout = logout;
+
+
+// IMPORT
 
 //  ------------- DOM const + EL + Class------------- 
 const inputNazev = document.getElementById("nazev");
@@ -173,5 +207,3 @@ document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() =
             th.classList.toggle("bg-info");
         }   
 })));
-
-
