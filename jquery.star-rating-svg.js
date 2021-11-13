@@ -10,7 +10,7 @@
 ;(function ( $, window, document, undefined ) {
 
   'use strict';
-
+  let hvezdIndex;
   // Create the defaults once
   var pluginName = 'starRating';
   var noop = function(){};
@@ -85,12 +85,13 @@
       this.$stars.on('mouseout', this.restoreState.bind(this));
       this.$stars.on('click', this.handleRating.bind(this));
     },
-
+    
     // apply styles to hovered stars
     hoverRating: function(e){
       var index = this.getIndex(e);
       this.paintStars(index, 'hovered');
       this.settings.onHover(index + 1, this._state.rating, this.$el);
+      hvezdIndex = index;
     },
 
     // clicked on a rate, apply style and state
@@ -177,6 +178,7 @@
         var ratedColor;
         if (s.ratedColors && s.ratedColors.length && s.ratedColors[ratedColorsIndex]) {
           ratedColor = s.ratedColors[ratedColorsIndex];
+          
         } else {
           ratedColor = this._defaults.ratedColor;
         }
