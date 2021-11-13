@@ -91,7 +91,18 @@
       var index = this.getIndex(e);
       this.paintStars(index, 'hovered');
       this.settings.onHover(index + 1, this._state.rating, this.$el);
-      hvezdIndex = index;
+      let hvezdIndex = index;
+      if (hvezdIndex <= 0) {
+          document.getElementById("recenze").textContent = "Ztráta času. Nedoporučuji.";
+      } else if (hvezdIndex <= 1) {
+          document.getElementById("recenze").textContent = "Kniha mne nebavila.";
+      } else if (hvezdIndex <= 2) {
+          document.getElementById("recenze").textContent = "Průměr, kniha mne bavila.";
+      } else if (hvezdIndex <= 3) {
+          document.getElementById("recenze").textContent = "Zážitek! Určitě doporučuji.";
+      } else if (hvezdIndex > 3) {
+          document.getElementById("recenze").textContent = "Super zážitek! Kandidát na knihu roku!";
+      }  
     },
 
     // clicked on a rate, apply style and state

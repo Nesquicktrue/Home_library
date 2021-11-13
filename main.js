@@ -75,7 +75,7 @@ let init = function(){
         starSize: 30,
         emptyColor: 'lightgray',
         hoverColor: 'dodgerblue',
-        activeColor: 'deepskyblue',
+        activeColor: 'green',
         useGradient: false,
         callback: function(currentRating, $el){
             return currentRating*10
