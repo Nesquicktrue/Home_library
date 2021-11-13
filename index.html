@@ -24,20 +24,27 @@
             <h1>Domácí knihovnička</h1>
         </div>
         
-        <div class="container"><button id="plusTlac" class="btn btn-primary">+</button></div>
+        <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseForm" 
+            role="button" aria-expanded="false" aria-controls="collapseForm">
+            +
+        </a>
 
-        <div id="pridejForm" class="neviditelny form" >
+        <div class="collapse" id="collapseForm">
             <form class="form">
                 <input class="form-control" type="text" id="nazev" placeholder="Název knihy">
                 <input class="form-control" type="text" id="autor" placeholder="Autor">
                 <input class="form-control" type="number" id="stran" placeholder="Počet stran (nepovinné)">
-                <label for="precteno">Již přečteno?</label>
-                <input class="form-check" type="checkbox" value="off" id="precteno">
-                <div id="ohodnot" class="neviditelny">
+                <!-- <label for="precteno">Již přečteno?</label> -->
+                <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" 
+                    role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
+                        Hodnocení
+                </a>
+                <div class="collapse" id="collapseOhodnot"> 
+                    <!-- <input class="form-check" type="checkbox" value="off" id="precteno"> -->
                     <div class="my-rating"></div>
                     <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
-                </div>
-                <input type="submit" class="submit">
+                </div> <br>
+                <input type="submit" class="submit btn btn-success m-2">
             </form>
         </div>
         <div class="vypis"></div>
@@ -62,5 +69,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script src="jquery.star-rating-svg.js"> </script>
 <script type="module" src="main.js"></script>
+<script>
+</script>
 </body>
 </html>

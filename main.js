@@ -56,16 +56,17 @@ let init = function(){
     const inputNazev = document.getElementById("nazev");
     const inputAutor = document.getElementById("autor");
     const inputStran = document.getElementById("stran");
-    const inputPrecteno = document.getElementById("precteno");
+    // const inputPrecteno = document.getElementById("precteno");
     const inputRecenze = document.getElementById("recenze");
     const form = document.querySelector("form");
-    const plusTlac = document.getElementById("plusTlac");
-    const pridejForm = document.getElementById("pridejForm");
+    // const plusTlac = document.getElementById("plusTlac");
+    // const pridejForm = document.getElementById("pridejForm");
     const table = document.getElementById("myTable");
     const blokOhodnot = document.getElementById("ohodnot");
 
     let knihy=[];
     let knihyFiltr = [];
+    let precteno = false;
     let idUser = user.uid;
 
     const inputHodnoceni = $(".my-rating").starRating({
@@ -82,34 +83,21 @@ let init = function(){
         }
     });
 
-    inputPrecteno.addEventListener("change", () => {
-        blokOhodnot.classList.toggle("neviditelny")
+    let inputPrecteno = document.getElementById("collapseOhodnot")
+    inputPrecteno.addEventListener('show.bs.collapse', function () {
+        precteno = true;
+        console.log(precteno);
+        document.getElementById("tlacPrecteno").textContent = "Zatím nehodnotit";
+        document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
+        document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
     });
-
-    blokOhodnot.addEventListener("click", () => {
-        switch (inputHodnoceni.starRating('getRating')) {
-            case 1:
-                inputRecenze.textContent = "Shit!"
-        }        
-
-    })
-
-
-    // class Kniha {
-    //     constructor(nazev, autor, pocetStranek, precteno, hodnoceni, recenze) {
-    //         this.nazev = nazev;
-    //         this.autor = autor;
-    //         this.pocetStranek = pocetStranek;
-    //         this.precteno = precteno;
-    //         this.hodnoceni = hodnoceni;
-    //         this.recenze = recenze;
-    //         this.info = function () {
-    //             return `Kniha "${nazev}" od autora ${autor} má ${pocetStranek} stran ${jePrecteno(this)}`;
-    //         };
-    //     }
-    // }
-
-    plusTlac.addEventListener("click", () => {pridejForm.classList.toggle("neviditelny")});
+    inputPrecteno.addEventListener('hide.bs.collapse', function () {
+        precteno = false;
+        console.log(precteno);
+        document.getElementById("tlacPrecteno").textContent = "Hodnocení";
+        document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
+        document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
+    });
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -123,7 +111,7 @@ let init = function(){
         inputAutor.value = "";
         inputStran.value = "";
         inputRecenze.value = "";
-        inputPrecteno.checked = false;
+        precteno = false;
     };
 
     function posliDoDatabaze () {
@@ -132,7 +120,7 @@ let init = function(){
             nazevKnihy: inputNazev.value,
             autor: inputAutor.value,
             stran: inputStran.value,
-            precteno: inputPrecteno.checked,
+            precteno: precteno,
             rating: inputHodnoceni.starRating('getRating'),
             recenze: inputRecenze.value
         })
