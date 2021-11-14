@@ -55,10 +55,10 @@ let init = function(){
         })
     })
 
-    const inputNazev = document.getElementById("nazev");
-    const inputAutor = document.getElementById("autor");
-    const inputStran = document.getElementById("stran");
-    const inputRecenze = document.getElementById("recenze");
+    // const inputNazev = document.getElementById("nazev");
+    // const inputAutor = document.getElementById("autor");
+    // const inputStran = document.getElementById("stran");
+    // const inputRecenze = document.getElementById("recenze");
     const form = document.querySelector("form");
     const table = document.getElementById("myTable");
 
@@ -98,9 +98,8 @@ let init = function(){
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         zjistiID();
-        vyprazdniPole();
-        naplnSeznamKnihzDB(); // --- vypsalo prvni novou porizeno až při refresh - nahrazeno refreshem
-        // location.reload();
+        setTimeout(() => {naplnSeznamKnihzDB()}, 500);
+        naplnSeznamKnihzDB(); // --- vypsalo prvni novou porizeno až při refresh - nahrazeno refreshem?
     });
 
     function vyprazdniPole () {
@@ -117,23 +116,26 @@ let init = function(){
             let idKnihy = snapshot.val();
             ++idKnihy;
             console.log(idKnihy); 
-            console.log(inputNazev.value); 
 
-            // posliDoDatabaze(idKnihy)
+            posliDoDatabaze(idKnihy)
         })
     }
 
     function posliDoDatabaze (id) {
-            set(ref(db, ("Users/" + idUser + "/knihy/" + id)),{
-                nazevKnihy: inputNazev.value,
-                autor: inputAutor.value,
-                stran: inputStran.value,
-                precteno: precteno,
-                rating: inputHodnoceni.starRating('getRating'),
-                recenze: inputRecenze.value,
-                pridano: today,
-                // id: id
-            });
+        const inputNazev = document.getElementById("nazev");
+        const inputAutor = document.getElementById("autor");
+        const inputStran = document.getElementById("stran");
+        const inputRecenze = document.getElementById("recenze");
+        set(ref(db, ("Users/" + idUser + "/knihy/" + id)),{
+            nazevKnihy: inputNazev.value,
+            autor: inputAutor.value,
+            stran: inputStran.value,
+            precteno: precteno,
+            rating: inputHodnoceni.starRating('getRating'),
+            recenze: inputRecenze.value,
+            pridano: today,
+            "idKnihy": id
+        });
             update(ref(db, ("Users/" + idUser + "/info")),{
                 "idKnizek": id
             })
@@ -152,13 +154,14 @@ let init = function(){
                 knihy.push(childSnapshot.val());
             })
             console.log(knihy)
+            
             buildTable(knihy)
         })
     }
 
     
     function buildTable(data){
-        table.innerHTML = ''
+        table.innerHTML = '';
         for (let i = 0; i < data.length; i++){
             
             // z row prozatím vypuštěno <td>${data[i].recenze}</td>
