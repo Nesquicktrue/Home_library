@@ -31,9 +31,9 @@
 
         <div class="collapse" id="collapseForm">
             <form class="form">
-                <input class="form-control" type="text" id="nazev" placeholder="Název knihy">
-                <input class="form-control" type="text" id="autor" placeholder="Autor">
-                <input class="form-control" type="number" id="stran" placeholder="Počet stran (nepovinné)">
+                <input class="form-control m-1" type="text" id="nazev" placeholder="Název knihy">
+                <input class="form-control m-1" type="text" id="autor" placeholder="Autor">
+                <input class="form-control m-1" type="number" id="stran" placeholder="Počet stran (nepovinné)">
                 <!-- <label for="precteno">Již přečteno?</label> -->
                 <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" 
                     role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
@@ -41,22 +41,29 @@
                 </a>
                 <div class="collapse" id="collapseOhodnot"> 
                     <!-- <input class="form-check" type="checkbox" value="off" id="precteno"> -->
-                    <div class="my-rating"></div>
+                    <div class="my-rating m-1"></div>
                     <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
                 </div> <br>
                 <input type="submit" class="submit btn btn-success m-2">
             </form>
         </div>
+
+        
         <div class="vypis"></div>
-            <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora..." >
+        <div class="collapse detail" id="collapseDetail">
+            TEST
+        </div>
+        <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora..." >
             <table class="table table-hover table-dark">
                 <thead>
                     <th scope="col" style="width: 25%" class="bg-info" data-colname="nazev" data-order="desc"> Název knihy <i class="fas fa-sort"></i></th>
                     <th scope="col" style="width: 15%" class="" data-colname="autor" data-order="desc"> Autor <i class="fas fa-sort"></i></th>
                     <th scope="col" style="width: 10%" class="" data-colname="stran" data-order="desc"> Stran <i class="fas fa-sort"></i></th>
                     <th scope="col" style="width: 5%" class="" data-colname="rating" data-order="desc"> ★ <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 35%" class="" data-colname="recenze" data-order="desc"> Recenze <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 10%" class="" data-colname="rating" data-order="desc"> Datum <i class="fas fa-sort"></i></th>
+                    <!-- <th scope="col" style="width: 35%" class="" data-colname="recenze" data-order="desc"> Recenze <i class="fas fa-sort"></i></th> -->
+                    <th scope="col" style="width: 10%" class="" data-colname="pridano" data-order="desc"> Přidáno <i class="fas fa-sort"></i></th>
+                    <th scope="col" style="width: 10%" class="" data-colname="akce" data-order="desc"> Akce <i class="fas fa-sort"></i></th>
+
                 </thead>
                 <tbody id="myTable" >
 

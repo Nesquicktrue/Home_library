@@ -2,3 +2,10 @@
     display: none;
 }
 
+.detail {
+    /* position: sticky; */
+    width: 50vw;
+    height: 50vw;
+    border: 5px solid red;
+    top: 0;
+}

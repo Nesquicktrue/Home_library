@@ -13,7 +13,7 @@ let firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
 const app = initializeApp(firebaseConfig);
-import {getDatabase, get, ref, set, child, update, remove}
+import {getDatabase, get, onValue, ref, set, child, update, remove}
 from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
 const db = getDatabase();  
 
@@ -35,10 +35,12 @@ let init = function(){
             console.warn("Nepřihlášen!");
             window.location.replace("login.html");
         }
-        set(ref(db, ("Users/" + user.uid + "/info")),{
+        
+        update(ref(db, ("Users/" + user.uid + "/info")),{
             jmeno: user.displayName,
             email: user.email,
             UID: user.uid,
+            lastLogin: new Date().toISOString().slice(0, 10),
         });
         uidLbl.textContent = user.displayName;
 
@@ -56,21 +58,17 @@ let init = function(){
     const inputNazev = document.getElementById("nazev");
     const inputAutor = document.getElementById("autor");
     const inputStran = document.getElementById("stran");
-    // const inputPrecteno = document.getElementById("precteno");
     const inputRecenze = document.getElementById("recenze");
     const form = document.querySelector("form");
-    // const plusTlac = document.getElementById("plusTlac");
-    // const pridejForm = document.getElementById("pridejForm");
     const table = document.getElementById("myTable");
-    const blokOhodnot = document.getElementById("ohodnot");
 
     let knihy=[];
     let knihyFiltr = [];
     let precteno = false;
     let idUser = user.uid;
+    let today = new Date().toISOString().slice(0, 10);
 
     const inputHodnoceni = $(".my-rating").starRating({
-        // starSize: 20,
         totalStars: 5,
         starShape: 'rounded',
         starSize: 30,
@@ -86,14 +84,12 @@ let init = function(){
     let inputPrecteno = document.getElementById("collapseOhodnot")
     inputPrecteno.addEventListener('show.bs.collapse', function () {
         precteno = true;
-        console.log(precteno);
         document.getElementById("tlacPrecteno").textContent = "Zatím nehodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
     });
     inputPrecteno.addEventListener('hide.bs.collapse', function () {
         precteno = false;
-        console.log(precteno);
         document.getElementById("tlacPrecteno").textContent = "Hodnocení";
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
@@ -101,9 +97,10 @@ let init = function(){
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-        posliDoDatabaze();
+        zjistiID();
         vyprazdniPole();
-        naplnSeznamKnihzDB();
+        naplnSeznamKnihzDB(); // --- vypsalo prvni novou porizeno až při refresh - nahrazeno refreshem
+        // location.reload();
     });
 
     function vyprazdniPole () {
@@ -114,25 +111,41 @@ let init = function(){
         precteno = false;
     };
 
-    function posliDoDatabaze () {
-        let idKnihy = knihy.length + 1;
-        set(ref(db, ("Users/" + idUser + "/knihy/" + idKnihy)),{
-            nazevKnihy: inputNazev.value,
-            autor: inputAutor.value,
-            stran: inputStran.value,
-            precteno: precteno,
-            rating: inputHodnoceni.starRating('getRating'),
-            recenze: inputRecenze.value
+    function zjistiID () {
+        get(ref(db, "Users/" + idUser + "/info/idKnizek"))
+        .then( (snapshot) => {
+            let idKnihy = snapshot.val();
+            ++idKnihy;
+            console.log(idKnihy); 
+            console.log(inputNazev.value); 
+
+            // posliDoDatabaze(idKnihy)
         })
+    }
+
+    function posliDoDatabaze (id) {
+            set(ref(db, ("Users/" + idUser + "/knihy/" + id)),{
+                nazevKnihy: inputNazev.value,
+                autor: inputAutor.value,
+                stran: inputStran.value,
+                precteno: precteno,
+                rating: inputHodnoceni.starRating('getRating'),
+                recenze: inputRecenze.value,
+                pridano: today,
+                // id: id
+            });
+            update(ref(db, ("Users/" + idUser + "/info")),{
+                "idKnizek": id
+            })
     }
 
     //  ------------- Vypis knih - Tabulka ------------- 
     naplnSeznamKnihzDB();  // načtu z DB knihy do array knihy[];
 
     function naplnSeznamKnihzDB(){
+        knihy = [];
         table.innerHTML = '';
         const dbRef = ref(db);
-        
         get(child(dbRef, ("Users/" + idUser + "/knihy")))
         .then((snapshot)=>{
             snapshot.forEach(childSnapshot => {
@@ -148,13 +161,18 @@ let init = function(){
         table.innerHTML = ''
         for (let i = 0; i < data.length; i++){
             
+            // z row prozatím vypuštěno <td>${data[i].recenze}</td>
             let row = `<tr>
             <td>${data[i].nazevKnihy}</td>
             <td>${data[i].autor}</td>
             <td>${data[i].stran}</td>
             <td>${data[i].rating}</td>
-            <td>${data[i].recenze}</td>
-            <td>${data[i].rating}</td>
+            <td>${data[i].pridano}</td>
+            <td>
+                <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseDetail" 
+                role="button" aria-expanded="false" aria-controls="collapseDetail">
+                info</a>
+            </td>
             </tr>`
             table.innerHTML += row
         }
@@ -186,9 +204,10 @@ let init = function(){
     
     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
     const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
     let predchoziStav;
+
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
         const table = th.closest('table');
         const tbody = table.querySelector('tbody');
