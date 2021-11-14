@@ -10,9 +10,12 @@ let firebaseConfig = {
     messagingSenderId: "109962970996",
     appId: "1:109962970996:web:2317b678700fc00da40e21"
 };
+
 firebase.initializeApp(firebaseConfig);
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
 const app = initializeApp(firebaseConfig);
+
 import {getDatabase, get, onValue, ref, set, child, update, remove}
 from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
 const db = getDatabase();  
@@ -128,8 +131,7 @@ let init = function(){
             update(ref(db, ("Users/" + idUser + "/info")),{
                 "idKnizek": id
             })
-            // vyprázdni zadávací pole
-            inputNazev.value = "";
+            inputNazev.value = "";          // vyprázdni zadávací pole
             inputAutor.value = "";
             inputStran.value = "";
             inputRecenze.value = "";
@@ -137,7 +139,8 @@ let init = function(){
     }
 
     //  ------------- Vypis knih - Tabulka ------------- 
-    naplnSeznamKnihzDB();  // načtu z DB knihy do array knihy[];
+
+    naplnSeznamKnihzDB();
 
     function naplnSeznamKnihzDB(){
         knihy = [];
@@ -167,14 +170,36 @@ let init = function(){
             <td>${data[i].rating}</td>
             <td>${data[i].pridano}</td>
             <td>
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseDetail" 
-                role="button" aria-expanded="false" aria-controls="collapseDetail">
+                <a class="btn btn-primary tlacInfo" href="#popup" id="${data[i].idKnihy}">
                 info</a>
             </td>
             </tr>`
             table.innerHTML += row
         }
+        vypisDetail();
     }
+    
+    //  ------------- Vypsání detailu knihy ------------- 
+    
+    function vypisDetail() {
+        const divInfo = document.querySelector(".detail-obsah");
+        const dbNazevKnihy = document.querySelector(".db-nazevKnihy");
+        const tlacInfo = document.querySelectorAll(".tlacInfo");
+        for (let i = 0; i < tlacInfo.length; i++) {
+        let self = tlacInfo[i];
+        self.addEventListener('click', function () {  
+            console.log("Kliknuto na knihu ID: " + self.id);
+            get(ref(db, "Users/" + idUser + "/knihy/" + self.id))
+            .then( (snapshot) => {
+                console.log(snapshot.val().autor)
+                dbNazevKnihy.textContent = snapshot.val().nazevKnihy;
+                divInfo.textContent = "Recenze: " + snapshot.val().recenze;
+
+            })
+        });
+    }
+    }
+
     //  ------------- Filtrování knih v tabulce ------------- 
     
     const inputFilter = document.getElementById("filtr");
@@ -221,7 +246,6 @@ let init = function(){
         }   
     })));
     
-//  ------------- Konec init Fce -------------     
 });
 }
 

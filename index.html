@@ -50,26 +50,34 @@
 
         
         <div class="vypis"></div>
-        <div class="collapse detail" id="collapseDetail">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis odio id modi autem blanditiis maiores, aliquam accusantium ratione culpa. Sit?
-        </div>
+        
         <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora..." >
-            <table class="table table-hover table-dark">
-                <thead>
-                    <th scope="col" style="width: 25%" class="bg-info" data-colname="nazev" data-order="desc"> Název knihy <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 15%" class="" data-colname="autor" data-order="desc"> Autor <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 10%" class="" data-colname="stran" data-order="desc"> Stran <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 5%" class="" data-colname="rating" data-order="desc"> ★ <i class="fas fa-sort"></i></th>
-                    <!-- <th scope="col" style="width: 35%" class="" data-colname="recenze" data-order="desc"> Recenze <i class="fas fa-sort"></i></th> -->
-                    <th scope="col" style="width: 10%" class="" data-colname="pridano" data-order="desc"> Přidáno <i class="fas fa-sort"></i></th>
-                    <th scope="col" style="width: 10%" class="" data-colname="akce" data-order="desc"> Akce <i class="fas fa-sort"></i></th>
-
-                </thead>
-                <tbody id="myTable" >
-
-                </tbody>
-            </table>
+        <table class="table table-hover table-dark">
+            <thead>
+                <th scope="col" style="width: 25%" class="bg-info" data-colname="nazev" data-order="desc"> Název knihy <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 15%" class="" data-colname="autor" data-order="desc"> Autor <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 10%" class="" data-colname="stran" data-order="desc"> Stran <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 5%" class="" data-colname="rating" data-order="desc"> ★ <i class="fas fa-sort"></i></th>
+                <!-- <th scope="col" style="width: 35%" class="" data-colname="recenze" data-order="desc"> Recenze <i class="fas fa-sort"></i></th> -->
+                <th scope="col" style="width: 10%" class="" data-colname="pridano" data-order="desc"> Přidáno <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 10%" class="" data-colname="akce" data-order="desc"> Akce <i class="fas fa-sort"></i></th>
+                
+            </thead>
+            <tbody id="myTable" >
+                
+            </tbody>
+        </table>
     </div>
+
+    <div class="overlay" id="popup">
+        <div class="popDetail">
+            <h2 class="db-nazevKnihy">Detail knihy</h2>
+            <a class="close" href="#">&times;</a>
+            <div class="detail-obsah">
+            </div>
+        </div>
+    </div>
+    
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
