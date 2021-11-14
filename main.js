@@ -55,10 +55,6 @@ let init = function(){
         })
     })
 
-    // const inputNazev = document.getElementById("nazev");
-    // const inputAutor = document.getElementById("autor");
-    // const inputStran = document.getElementById("stran");
-    // const inputRecenze = document.getElementById("recenze");
     const form = document.querySelector("form");
     const table = document.getElementById("myTable");
 
@@ -80,7 +76,7 @@ let init = function(){
             return currentRating*10
         }
     });
-
+  
     let inputPrecteno = document.getElementById("collapseOhodnot")
     inputPrecteno.addEventListener('show.bs.collapse', function () {
         precteno = true;
@@ -95,20 +91,13 @@ let init = function(){
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
     });
 
+    // ------------- Přidej knihu ------------- 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         zjistiID();
         setTimeout(() => {naplnSeznamKnihzDB()}, 500);
-        naplnSeznamKnihzDB(); // --- vypsalo prvni novou porizeno až při refresh - nahrazeno refreshem?
     });
 
-    function vyprazdniPole () {
-        inputNazev.value = "";
-        inputAutor.value = "";
-        inputStran.value = "";
-        inputRecenze.value = "";
-        precteno = false;
-    };
 
     function zjistiID () {
         get(ref(db, "Users/" + idUser + "/info/idKnizek"))
@@ -139,6 +128,12 @@ let init = function(){
             update(ref(db, ("Users/" + idUser + "/info")),{
                 "idKnizek": id
             })
+            // vyprázdni zadávací pole
+            inputNazev.value = "";
+            inputAutor.value = "";
+            inputStran.value = "";
+            inputRecenze.value = "";
+            precteno = false;
     }
 
     //  ------------- Vypis knih - Tabulka ------------- 
