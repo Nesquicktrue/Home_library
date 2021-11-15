@@ -45,6 +45,7 @@ let init = function(){
             UID: user.uid,
             lastLogin: new Date().toISOString().slice(0, 10),
         });
+        
         uidLbl.textContent = user.displayName;
 
 
