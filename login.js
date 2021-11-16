@@ -12,6 +12,7 @@ firebase.initializeApp(firebaseConfig);
 
 // Přihlašovací dialog pro Firebase
 let uiConfig = {
+    
     callbacks: {
         signInSuccessWithAuthResult: function(authResult, redirectUrl) {
              console.log(authResult)

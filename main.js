@@ -183,18 +183,50 @@ let init = function(){
     //  ------------- Vypsání detailu knihy ------------- 
     
     function vypisDetail() {
-        const divInfo = document.querySelector(".detail-obsah");
-        const dbNazevKnihy = document.querySelector(".db-nazevKnihy");
+        // const detObsah = document.querySelector("#detObsah");
+        const detNazev = document.querySelector("#detNazev");
+        const detAutor = document.querySelector("#detAutor");
+        const detStran = document.querySelector("#detStran");
+        const detPridano = document.querySelector("#detPridano");
+        const detRecenze = document.querySelector("#detRecenze");
+        const detRating = document.querySelector("#detRating");
+        
+        const tlacUpravKnihu = document.querySelector("#upravKnihu");
+        const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const tlacInfo = document.querySelectorAll(".tlacInfo");
         for (let i = 0; i < tlacInfo.length; i++) {
         let self = tlacInfo[i];
         self.addEventListener('click', function () {  
+            let upravitDetail = true;
             console.log("Kliknuto na knihu ID: " + self.id);
             get(ref(db, "Users/" + idUser + "/knihy/" + self.id))
             .then( (snapshot) => {
                 console.log(snapshot.val().autor)
-                dbNazevKnihy.textContent = snapshot.val().nazevKnihy;
-                divInfo.textContent = "Recenze: " + snapshot.val().recenze;
+                detNazev.textContent = snapshot.val().nazevKnihy;
+                detAutor.textContent = snapshot.val().autor;
+                detStran.textContent = snapshot.val().stran;
+                detRecenze.textContent = snapshot.val().recenze;
+                detPridano.textContent = snapshot.val().pridano;
+                detRating.textContent = snapshot.val().rating + "★";
+
+                tlacUpravKnihu.addEventListener("click",() => {
+                    if (upravitDetail === true) {
+                        tlacUpravKnihu.textContent = "Uložit změny";    
+                        // detRating.innerHTML = '<div class="my-rating m-1"></div>';
+                        detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" >'+snapshot.val().recenze+'</textarea>';
+                        upravitDetail = false;
+                    } else {
+                        update(ref(db, ("Users/" + idUser + "/knihy/" + self.id)),{
+                            precteno: true,
+                            rating: 2.5, // Vyřešit rating !!!!!!!!!!!!!!!!!!!!!
+                            recenze: document.getElementById("upRecenze").value,
+                        });
+                        detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font><br>Nyní znovu načtu stránku <i class="fas fa-hourglass-clock"></i>';
+                        tlacUpravKnihu.textContent = "Upravit";
+                        upravitDetail = true;
+                        naplnSeznamKnihzDB()
+                    }
+                })
 
             })
         });
