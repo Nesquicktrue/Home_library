@@ -144,6 +144,7 @@ let init = function(){
     naplnSeznamKnihzDB();
 
     function naplnSeznamKnihzDB(){
+        // table.outerHTML = table.outerHTML;
         knihy = [];
         table.innerHTML = '';
         const dbRef = ref(db);
@@ -160,6 +161,8 @@ let init = function(){
 
     
     function buildTable(data){
+
+        
         table.innerHTML = '';
         for (let i = 0; i < data.length; i++){
             
@@ -177,69 +180,100 @@ let init = function(){
             </tr>`
             table.innerHTML += row
         }
-            vypisDetail();
+        vypisDetail();
     }
         // -------------- GLOBAL
     const detNazev = document.querySelector("#detNazev");
     const detAutor = document.querySelector("#detAutor");
     const detStran = document.querySelector("#detStran");
     const detPridano = document.querySelector("#detPridano");
+    const detID = document.querySelector("#detID");
     const detRecenze = document.querySelector("#detRecenze");
     const detRating = document.querySelector("#detRating");
     const tlacUpravKnihu = document.querySelector("#upravKnihu");
     const tlacSmazKnihu = document.querySelector("#smazatKnihu");
+    let upravovano; // ukádám stav tlačítka pro úpravu hodnocení knihy
+    let opravduSmazat;
 
     //  ------------- Vypsání detailu knihy ------------- 
     
     function vypisDetail() {
     // const detObsah = document.querySelector("#detObsah");
-    const tlacInfo = document.querySelectorAll(".tlacInfo");
-    for (let i = 0; i < tlacInfo.length; i++) {
-        let self = tlacInfo[i];
-        self.addEventListener('click', () => {  
-            get(ref(db, "Users/" + idUser + "/knihy/" + self.id))
-            .then( (snapshot) => {
-                detNazev.textContent = snapshot.val().nazevKnihy;
-                detAutor.textContent = snapshot.val().autor;
-                detStran.textContent = snapshot.val().stran;
-                detRecenze.textContent = snapshot.val().recenze;
-                detPridano.textContent = snapshot.val().pridano;
-                detRating.textContent = snapshot.val().rating + "★";
+        const tlacInfo = document.querySelectorAll(".tlacInfo");
 
-                tlacUpravKnihu.addEventListener("click",() => {upravDetail(self.id)});
+        for (let i = 0; i < tlacInfo.length; i++) {
+            let self = tlacInfo[i];
+            self.addEventListener('click', () => {
+                upravovano = 2;
+                opravduSmazat = 0;
+                tlacUpravKnihu.textContent = "Upravit";
+                tlacSmazKnihu.textContent = "Smazat";
+                get(ref(db, "Users/" + idUser + "/knihy/" + self.id))
+                .then( (snapshot) => {
+                    detNazev.textContent = snapshot.val().nazevKnihy;
+                    detAutor.textContent = snapshot.val().autor;
+                    detStran.textContent = snapshot.val().stran;
+                    detRecenze.textContent = snapshot.val().recenze;
+                    detPridano.textContent = snapshot.val().pridano;
+                    detID.textContent = snapshot.val().idKnihy;
+                    detRating.textContent = snapshot.val().rating + "★";
+                    console.log("další klik Upravovano = " + upravovano) 
+                    
+                })
             })
-        })
-    }   }
+        }   
+        tlacUpravKnihu.addEventListener("click", upravDetail);
+        tlacSmazKnihu.addEventListener("click", smazKnihu);
+    }   
 
-    function upravDetail(idK) {
+    function upravDetail() {
+            let idK = detID.textContent;
+            upravovano %= 2;
+            console.log(upravovano)
+            if (upravovano === 0) {
+                tlacUpravKnihu.textContent = "Uložit změny";    
+                // detRating.innerHTML = '<div class="my-rating m-1"></div>';
+                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" > test </textarea>';
+                upravovano++;
+         } else {
+             update(ref(db, ("Users/" + idUser + "/knihy/" + idK)),{
+                 precteno: true,
+                 rating: 2.5, // Vyřešit rating !!!!!!!!!!!!!!!!!!!!!
+                 recenze: document.getElementById("upRecenze").value,
+             });
+             detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font>';
+             tlacUpravKnihu.textContent = "Upravit";
+             upravovano++;
+         }
+    }
 
-        if (upravitDetail === true) {
-            tlacUpravKnihu.textContent = "Uložit změny";    
-            // detRating.innerHTML = '<div class="my-rating m-1"></div>';
-            detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" >'+snapshot.val().recenze+'</textarea>';
-            upravitDetail = false;
-        } else {
-            update(ref(db, ("Users/" + idUser + "/knihy/" + self.id)),{
-                precteno: true,
-                rating: 2.5, // Vyřešit rating !!!!!!!!!!!!!!!!!!!!!
-                recenze: document.getElementById("upRecenze").value,
-            });
-            detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font><br>Nyní znovu načtu stránku <i class="fas fa-hourglass-clock"></i>';
-            tlacUpravKnihu.textContent = "Upravit";
-            upravitDetail = true;
-            naplnSeznamKnihzDB()
-        }
+    function smazKnihu () {
+        opravduSmazat++;
+        let idK = detID.textContent;
+        switch (opravduSmazat) {
+            case 3:
+                remove(ref(db, ("Users/" + idUser + "/knihy/" + idK)));
+                console.log("kniha smazána");
+                detRecenze.innerHTML = '<i class="fas fa-skull-crossbones"></i><font style="color:red">&nbsp;Kniha byla smazána</font>';
+                break;
+            case 2:
+                detRecenze.innerHTML = '<i class="fas fa-skull-crossbones"></i><font style="color:red">&nbsp;Tato kniha bude nenávratně smazána!<br>Pokud souhlasíte, zmáčkněte smazání ještě jednou.</font>';
+                break;
+            case 1:
+                tlacSmazKnihu.textContent = "Opravdu smazat?";
+                break;
+        }   
     }
 
     //  ------------- Filtrování knih v tabulce ------------- 
     
     const inputFilter = document.getElementById("filtr");
-    inputFilter.addEventListener("keyup", () => {
+    inputFilter.addEventListener("keyup", () => { 
         let filtrUdaj = inputFilter.value;
-        let data = filtrujTabulku(filtrUdaj, knihy)
-        buildTable(data)
+        let data = filtrujTabulku(filtrUdaj, knihy);
+        buildTable(data);
     })
-    
+
     function filtrujTabulku(filtrUdaj, knihy) {
         knihyFiltr = [];
         for (let i=0; i < knihy.length; i++){
