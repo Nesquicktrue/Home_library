@@ -18,10 +18,12 @@
 <body>
 <div id="main_container" style="display:none;">
     <div class="container">
-        Přihlášený uživatel: <label id="UID" class=""></label>
-        <button id="logout" class="btn btn-primary">Odhlásit</button>
+        <div class="d-flex flex-row-reverse align-items-center bd-highlight mb-3">
+            <button id="logout" class="btn btn-primary m-2">Odhlásit</button>
+            <span id="UID" class="h5"></span>
+        </div>
         <div class="uvod">
-            <h1>Domácí knihovnička</h1>
+            <h1>Domácí knihovna</h1>
         </div>
         
         <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseForm" 
@@ -34,13 +36,11 @@
                 <input class="form-control m-1" type="text" id="nazev" placeholder="Název knihy">
                 <input class="form-control m-1" type="text" id="autor" placeholder="Autor">
                 <input class="form-control m-1" type="number" id="stran" placeholder="Počet stran (nepovinné)">
-                <!-- <label for="precteno">Již přečteno?</label> -->
                 <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" 
                     role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
                         Hodnocení
                 </a>
                 <div class="collapse" id="collapseOhodnot"> 
-                    <!-- <input class="form-check" type="checkbox" value="off" id="precteno"> -->
                     <div class="my-rating m-1"></div>
                     <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
                 </div> <br>
@@ -76,11 +76,11 @@
             <div id="detObsah">
                 <div class="detLeva">
                     Autor:<br>
-                    <h3 id="detAutor">Jan Novák</h3>
+                    <h3 id="detAutor"></h3>
                     Počet stran:
-                    <h3 id="detStran">655</h3>
+                    <h3 id="detStran"></h3>
                     Přidáno:
-                    <h6 id="detPridano">2021-11-15</h6>
+                    <h6 id="detPridano"></h6>
                     ID:
                     <h6 id="detID"></h6>
                     <button class="btn btn-primary m-1" id="upravKnihu">Upravit</button>
@@ -88,7 +88,7 @@
 
                 </div>
                 <div class="detPrava">
-                    <h3 id="detRating">0★</h3>
+                    <h3 id="detRating">★</h3>
                     <form>
                     <h6 id="detRecenze"></h6>
                     </form>

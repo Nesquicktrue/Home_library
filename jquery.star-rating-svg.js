@@ -24,7 +24,7 @@
     ratedColor: 'crimson',
     useGradient: true,
     readOnly: false,
-    disableAfterRate: true,
+    // disableAfterRate: true,
     baseUrl: false,
     starGradient: {
       start: '#FEF7CD',

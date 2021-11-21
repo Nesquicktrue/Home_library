@@ -49,7 +49,7 @@ let init = function(){
         uidLbl.textContent = user.displayName;
 
 
-    //  ------------- DOM const + EL + Class------------- 
+    //  ------------- DOM + CONST + GLOBAL ------------- 
 
     const tlacOdhlasit = document.getElementById("logout")
     tlacOdhlasit.addEventListener("click", () => {
@@ -61,9 +61,19 @@ let init = function(){
 
     const form = document.querySelector("form");
     const table = document.getElementById("myTable");
-
-    let knihy=[];
-    let knihyFiltr = [];
+    const detNazev = document.querySelector("#detNazev");
+    const detAutor = document.querySelector("#detAutor");
+    const detStran = document.querySelector("#detStran");
+    const detPridano = document.querySelector("#detPridano");
+    const detID = document.querySelector("#detID");
+    const detRecenze = document.querySelector("#detRecenze");
+    const detRating = document.querySelector("#detRating");
+    const tlacUpravKnihu = document.querySelector("#upravKnihu");
+    const tlacSmazKnihu = document.querySelector("#smazatKnihu");
+    let upravovano; // ukádám stav tlačítka pro úpravu hodnocení knihy
+    let opravduSmazat; // počet zmáčknutí tlačítka pro smazání knihy
+    let knihy=[]; // plný výčet z DB
+    let knihyFiltr = []; // filrovaný
     let precteno = false;
     let idUser = user.uid;
     let today = new Date().toISOString().slice(0, 10);
@@ -71,16 +81,18 @@ let init = function(){
     const inputHodnoceni = $(".my-rating").starRating({
         totalStars: 5,
         starShape: 'rounded',
+        disableAfterRate: false,
         starSize: 30,
         emptyColor: 'lightgray',
         hoverColor: 'dodgerblue',
         activeColor: 'green',
-        useGradient: false,
+        useGradient: true,
         callback: function(currentRating, $el){
             return currentRating*10
         }
     });
   
+    //  ------------- Hodnocení nové knihy - collapse ------------- 
     let inputPrecteno = document.getElementById("collapseOhodnot")
     inputPrecteno.addEventListener('show.bs.collapse', function () {
         precteno = true;
@@ -90,6 +102,7 @@ let init = function(){
     });
     inputPrecteno.addEventListener('hide.bs.collapse', function () {
         precteno = false;
+        $(".my-rating").starRating("setReadOnly");
         document.getElementById("tlacPrecteno").textContent = "Hodnocení";
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
@@ -102,14 +115,11 @@ let init = function(){
         setTimeout(() => {naplnSeznamKnihzDB()}, 500);
     });
 
-
     function zjistiID () {
         get(ref(db, "Users/" + idUser + "/info/idKnizek"))
         .then( (snapshot) => {
             let idKnihy = snapshot.val();
             ++idKnihy;
-            console.log(idKnihy); 
-
             posliDoDatabaze(idKnihy)
         })
     }
@@ -144,7 +154,6 @@ let init = function(){
     naplnSeznamKnihzDB();
 
     function naplnSeznamKnihzDB(){
-        // table.outerHTML = table.outerHTML;
         knihy = [];
         table.innerHTML = '';
         const dbRef = ref(db);
@@ -153,19 +162,13 @@ let init = function(){
             snapshot.forEach(childSnapshot => {
                 knihy.push(childSnapshot.val());
             })
-            console.log(knihy)
-            
             buildTable(knihy)
         })
     }
 
-    
     function buildTable(data){
-
-        
         table.innerHTML = '';
         for (let i = 0; i < data.length; i++){
-            
             // z row prozatím vypuštěno <td>${data[i].recenze}</td>
             let row = `<tr>
             <td>${data[i].nazevKnihy}</td>
@@ -182,25 +185,11 @@ let init = function(){
         }
         vypisDetail();
     }
-        // -------------- GLOBAL
-    const detNazev = document.querySelector("#detNazev");
-    const detAutor = document.querySelector("#detAutor");
-    const detStran = document.querySelector("#detStran");
-    const detPridano = document.querySelector("#detPridano");
-    const detID = document.querySelector("#detID");
-    const detRecenze = document.querySelector("#detRecenze");
-    const detRating = document.querySelector("#detRating");
-    const tlacUpravKnihu = document.querySelector("#upravKnihu");
-    const tlacSmazKnihu = document.querySelector("#smazatKnihu");
-    let upravovano; // ukádám stav tlačítka pro úpravu hodnocení knihy
-    let opravduSmazat;
 
     //  ------------- Vypsání detailu knihy ------------- 
     
     function vypisDetail() {
-    // const detObsah = document.querySelector("#detObsah");
         const tlacInfo = document.querySelectorAll(".tlacInfo");
-
         for (let i = 0; i < tlacInfo.length; i++) {
             let self = tlacInfo[i];
             self.addEventListener('click', () => {
@@ -217,8 +206,6 @@ let init = function(){
                     detPridano.textContent = snapshot.val().pridano;
                     detID.textContent = snapshot.val().idKnihy;
                     detRating.textContent = snapshot.val().rating + "★";
-                    console.log("další klik Upravovano = " + upravovano) 
-                    
                 })
             })
         }   
@@ -229,16 +216,28 @@ let init = function(){
     function upravDetail() {
             let idK = detID.textContent;
             upravovano %= 2;
-            console.log(upravovano)
             if (upravovano === 0) {
                 tlacUpravKnihu.textContent = "Uložit změny";    
-                // detRating.innerHTML = '<div class="my-rating m-1"></div>';
-                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" > test </textarea>';
+                detRating.innerHTML = '<div class="upRating m-1"></div>';
+                $(".upRating").starRating({
+                    totalStars: 5,
+                    starShape: 'rounded',
+                    disableAfterRate: false,
+                    starSize: 30,
+                    emptyColor: 'lightgray',
+                    hoverColor: 'dodgerblue',
+                    activeColor: 'green',
+                    useGradient: true,
+                    callback: function(currentRating, $el){
+                        return currentRating*10
+                    }
+                });
+                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" >' + detRecenze.textContent + '</textarea>';
                 upravovano++;
          } else {
              update(ref(db, ("Users/" + idUser + "/knihy/" + idK)),{
                  precteno: true,
-                 rating: 2.5, // Vyřešit rating !!!!!!!!!!!!!!!!!!!!!
+                 rating: $(".upRating").starRating('getRating'),
                  recenze: document.getElementById("upRecenze").value,
              });
              detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font>';
