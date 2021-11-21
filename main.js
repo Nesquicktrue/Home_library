@@ -169,16 +169,16 @@ let init = function(){
     function buildTable(data){
         table.innerHTML = '';
         for (let i = 0; i < data.length; i++){
-            // z row prozatím vypuštěno <td>${data[i].recenze}</td>
+            // z row prozatím vypuštěno <td>${data[i].recenze}</td> a <td>${data[i].stran}</td>
             let row = `<tr>
             <td>${data[i].nazevKnihy}</td>
             <td>${data[i].autor}</td>
-            <td>${data[i].stran}</td>
+            
             <td>${data[i].rating}</td>
             <td>${data[i].pridano}</td>
             <td>
-                <a class="btn btn-primary tlacInfo" href="#popup" id="${data[i].idKnihy}">
-                info</a>
+                <a class="btn btn-sm btn-primary tlacInfo" href="#popup" id="${data[i].idKnihy}">
+                <i class="fas fa-pen-to-square"></i></a>
             </td>
             </tr>`
             table.innerHTML += row

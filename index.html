@@ -19,8 +19,11 @@
 <div id="main_container" style="display:none;">
     <div class="container">
         <div class="d-flex flex-row-reverse align-items-center bd-highlight mb-3">
-            <button id="logout" class="btn btn-primary m-2">Odhlásit</button>
-            <span id="UID" class="h5"></span>
+            <button id="logout" class="btn btn-primary ms-2">Odhlásit</button>
+            <div class="d-flex flex-column">
+                <span class="m-0" style="font-size:smaller">Přihlášen:</span>
+                <span id="UID" class="h6 m-0"></span>
+            </div>
         </div>
         <div class="uvod">
             <h1>Domácí knihovna</h1>
@@ -52,13 +55,13 @@
         <div class="vypis"></div>
         
         <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora..." >
-        <table class="table table-hover table-dark">
+        <table class="table table-hover table-light m-0">
             <thead>
                 <th scope="col" style="width: 25%" class="bg-info" data-colname="nazev" data-order="desc"> Název knihy <i class="fas fa-sort"></i></th>
-                <th scope="col" style="width: 15%" class="" data-colname="autor" data-order="desc"> Autor <i class="fas fa-sort"></i></th>
-                <th scope="col" style="width: 10%" class="" data-colname="stran" data-order="desc"> Stran <i class="fas fa-sort"></i></th>
-                <th scope="col" style="width: 5%" class="" data-colname="rating" data-order="desc"> ★ <i class="fas fa-sort"></i></th>
-                <th scope="col" style="width: 10%" class="" data-colname="pridano" data-order="desc"> Přidáno <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 20%" class="" data-colname="autor" data-order="desc"> Autor <i class="fas fa-sort"></i></th>
+                <!-- <th scope="col" style="width: 15%" class="" data-colname="stran" data-order="desc"> Stran <i class="fas fa-sort"></i></th> -->
+                <th scope="col" style="width: 10%" class="" data-colname="rating" data-order="desc"> ★ <i class="fas fa-sort"></i></th>
+                <th scope="col" style="width: 20%" class="" data-colname="pridano" data-order="desc"> Přidáno <i class="fas fa-sort"></i></th>
                 <th scope="col" style="width: 10%" class="" data-colname="akce" data-order="desc"> Detail <i class="fas fa-sort"></i></th>
                 
             </thead>
@@ -69,11 +72,12 @@
     </div>
 
     <div class="overlay" id="popup">
-        <div class="popDetail container"><br>
+   
+        <div class="popDetail d-flex container flex-column m-3 align-items-center bg-white"><br>
             <h2 id="detNazev">Detail knihy</h2>
             <a class="close" href="#">&times;</a><br>
-            <div id="detObsah">
-                <div class="detLeva">
+            <div id="detObsah" class="d-flex container flex-row justify-content-evenly align-items-start flex-wrap">
+                <div class="detLeva p-2">
                     Autor:<br>
                     <h3 id="detAutor"></h3>
                     Počet stran:
@@ -86,7 +90,7 @@
                     <button class="btn btn-danger m-1" id="smazatKnihu">Smazat</button>
 
                 </div>
-                <div class="detPrava">
+                <div class="detPrava p-2">
                     <h3 id="detRating">★</h3>
                     <form>
                     <h6 id="detRecenze"></h6>
@@ -94,6 +98,7 @@
                 </div>
             </div>
         </div>
+    
     </div>
     
 </div>
