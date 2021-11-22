@@ -232,7 +232,8 @@ let init = function(){
                         return currentRating*10
                     }
                 });
-                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="4" >' + detRecenze.textContent + '</textarea>';
+                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="10" >' +
+                                        detRecenze.textContent + '</textarea>';
                 upravovano++;
          } else {
              update(ref(db, ("Users/" + idUser + "/knihy/" + idK)),{
@@ -243,6 +244,7 @@ let init = function(){
              detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font>';
              tlacUpravKnihu.textContent = "Upravit";
              upravovano++;
+             setTimeout(() => {naplnSeznamKnihzDB()}, 500);
          }
     }
 
@@ -254,6 +256,8 @@ let init = function(){
                 remove(ref(db, ("Users/" + idUser + "/knihy/" + idK)));
                 console.log("kniha smazána");
                 detRecenze.innerHTML = '<i class="fas fa-skull-crossbones"></i><font style="color:red">&nbsp;Kniha byla smazána</font>';
+                tlacSmazKnihu.textContent = "SMAZÁNO";
+                setTimeout(() => {naplnSeznamKnihzDB()}, 500);   
                 break;
             case 2:
                 detRecenze.innerHTML = '<i class="fas fa-skull-crossbones"></i><font style="color:red">&nbsp;Tato kniha bude nenávratně smazána!<br>Pokud souhlasíte, zmáčkněte smazání ještě jednou.</font>';
@@ -261,7 +265,9 @@ let init = function(){
             case 1:
                 tlacSmazKnihu.textContent = "Opravdu smazat?";
                 break;
-        }   
+            default:
+                tlacSmazKnihu.textContent = "SMAZÁNO";
+        }
     }
 
     //  ------------- Filtrování knih v tabulce ------------- 
@@ -293,7 +299,6 @@ let init = function(){
     const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
         v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
         )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-    let predchoziStav;
 
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
         const table = th.closest('table');
