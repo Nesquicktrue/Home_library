@@ -2,6 +2,12 @@
     display: none;
 }
 
+.hledVysledek:hover {
+  background-color: #0dcaf0;
+}
+.hledVysledek {
+  background-color: #f8f9fa;
+}
 
 .overlay {
     position: fixed;

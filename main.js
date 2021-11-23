@@ -59,6 +59,8 @@ let init = function(){
         })
     })
 
+    const inputAutor = document.getElementById("autor");
+    const inputNazev = document.getElementById("nazev");
     const form = document.querySelector("form");
     const table = document.getElementById("myTable");
     const detNazev = document.querySelector("#detNazev");
@@ -70,12 +72,15 @@ let init = function(){
     const detRating = document.querySelector("#detRating");
     const tlacUpravKnihu = document.querySelector("#upravKnihu");
     const tlacSmazKnihu = document.querySelector("#smazatKnihu");
+    const divVysledek = document.querySelector(".vysledek");
+
     let upravovano; // ukádám stav tlačítka pro úpravu hodnocení knihy
     let opravduSmazat; // počet zmáčknutí tlačítka pro smazání knihy
     let knihy=[]; // plný výčet z DB
     let knihyFiltr = []; // filrovaný
     let precteno = false;
     let idUser = user.uid;
+    let idGoogle; // po výběru knihy z Google hledání
     let today = new Date().toISOString().slice(0, 10);
 
     const inputHodnoceni = $(".my-rating").starRating({
@@ -93,20 +98,24 @@ let init = function(){
     });
   
     //  ------------- Hodnocení nové knihy - collapse ------------- 
-    let inputPrecteno = document.getElementById("collapseOhodnot")
-    inputPrecteno.addEventListener('show.bs.collapse', function () {
+    let inputPrecteno = document.getElementById("collapseOhodnot");
+    inputPrecteno.addEventListener('show.bs.collapse', rozbalHodnoceni); 
+    inputPrecteno.addEventListener('hide.bs.collapse', srolujHodnoceni); 
+    
+    function rozbalHodnoceni () {
         precteno = true;
-        document.getElementById("tlacPrecteno").textContent = "Zatím nehodnotit";
+        document.getElementById("tlacPrecteno").textContent = "Nemám přečteno a nechci zatím hodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
-    });
-    inputPrecteno.addEventListener('hide.bs.collapse', function () {
+    };
+
+    function srolujHodnoceni () {
         precteno = false;
         $(".my-rating").starRating("setReadOnly");
-        document.getElementById("tlacPrecteno").textContent = "Hodnocení";
+        document.getElementById("tlacPrecteno").textContent = "Mám přečteno a chci hodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
-    });
+    };
 
     // ------------- Přidej knihu ------------- 
     form.addEventListener("submit", (e) => {
@@ -125,8 +134,8 @@ let init = function(){
     }
 
     function posliDoDatabaze (id) {
-        const inputNazev = document.getElementById("nazev");
-        const inputAutor = document.getElementById("autor");
+        // inputNazev a inputAutor je global kvůlu Google API hledání
+       
         const inputStran = document.getElementById("stran");
         const inputRecenze = document.getElementById("recenze");
         set(ref(db, ("Users/" + idUser + "/knihy/" + id)),{
@@ -137,7 +146,8 @@ let init = function(){
             rating: inputHodnoceni.starRating('getRating'),
             recenze: inputRecenze.value,
             pridano: today,
-            "idKnihy": id
+            "idKnihy": id,
+            "idGoogle": idGoogle
         });
             update(ref(db, ("Users/" + idUser + "/info")),{
                 "idKnizek": id
@@ -147,6 +157,112 @@ let init = function(){
             inputStran.value = "";
             inputRecenze.value = "";
             precteno = false;
+    }
+
+
+    //  ------------- Google books API hledání ------------- 
+
+    document.getElementById("nazev").addEventListener("keyup", hledejNaGoogleBooks)
+    document.getElementById("autor").addEventListener("keyup", hledejNaGoogleBooks)
+    
+    function hledejNaGoogleBooks () {
+        let hledanyVyraz;
+        if (inputNazev.value.length > 3) {
+            if ( inputAutor.value ) {
+                hledanyVyraz = "intitle:" + inputNazev.value.replace(/\s+/g, '+');//.toLowerCase()
+                hledanyVyraz += "+inauthor:" + inputAutor.value.replace(/\s+/g, '+');//.toLowerCase();
+            } else {
+                hledanyVyraz = inputNazev.value.replace(/\s+/g, '+')//.toLowerCase()
+            }
+            najdiAVypisZGoogle (hledanyVyraz)
+            
+        } else {
+            if ( inputAutor.value.length > 3) {
+                hledanyVyraz = "+inauthor:" + inputAutor.value.replace(/\s+/g, '+');
+                najdiAVypisZGoogle (hledanyVyraz)
+            } else {
+                divVysledek.innerHTML = "<h6>Zadejte více jak 3 znaky pro vyhledání v databázy Google Books</h6>";
+            }
+        }
+          
+    }
+    
+    function najdiAVypisZGoogle (hledanyVyraz) {
+        divVysledek.innerHTML = "<h6>Výsledky hledání na Google Knihy:</h6>";
+        let hledObr;
+        let hledPodtitul;
+        let hledStran;
+        let hledJazyk;
+        fetch("https://www.googleapis.com/books/v1/volumes?q=" 
+            + hledanyVyraz + "&printType=books") //&orderBy=newest
+        .then(function(res) {
+            return res.json();
+        })
+        .then(function(response) {
+            if (response.items) {
+                for (let i = 0; i < response.items.length ; i++) {
+                    let item = response.items[i];
+                    // in production code, item.text should have the HTML entities escaped.
+                    if (item.volumeInfo.authors) {
+                        if (item.volumeInfo.imageLinks) {
+                            hledObr =   '<img src=' + item.volumeInfo.imageLinks.smallThumbnail +
+                                        '" class="img-fluid rounded-start">';
+                        } else {
+                            hledObr =   '<img src="./img/no_cover_thumb.gif"' + 
+                                        'class="img-fluid rounded-start">';
+                        }
+                        (item.volumeInfo.subtitle) ? 
+                            (hledPodtitul= ": " + item.volumeInfo.subtitle) : (hledPodtitul = ""); 
+                        (item.volumeInfo.pageCount) ?
+                            (hledStran = ", stran: " + item.volumeInfo.pageCount) :  (hledStran = ", stran: N/A");
+                        (item.volumeInfo.language) ? 
+                            ( hledJazyk= ", " + item.volumeInfo.language.toUpperCase()) : (hledPodtitul = "");
+
+                        divVysledek.innerHTML +='<div class="hledVysledek card mb-1" style="max-width: 450px;" id='
+                                                + item.id + '>' + '<div class="row g-0">' + 
+                                                '<div class="col-md-2">' + 
+                                                hledObr + '</div>' +
+                                                '<div class="col-md-8">' + '<div class="card-body">' +
+                                                '<h6 class="card-title">' + item.volumeInfo.title +
+                                                hledPodtitul + '</h6>' +
+                                                '<p class="card-text"><span>' +
+                                                item.volumeInfo.authors[0] +
+                                                "</span>, " +
+                                                item.volumeInfo.publishedDate.slice(0,4) +
+                                                hledStran +
+                                                hledJazyk + '</p>' +
+                                                "</div></div></div></div><br>";
+                        
+                    }
+                }   
+            } else {
+                                        divVysledek.innerHTML = "<h6>Kniha nenalezena v Google Knihy</h6>";
+                                    }
+        const hledVysledek = document.querySelectorAll(".hledVysledek");
+        vyberZHledanych(hledVysledek); 
+        }),
+        
+        function(error) {
+        console.log(error);
+        };
+        
+    }
+    
+    function vyberZHledanych (hledVysledek) {
+        for (let i=0; i < hledVysledek.length; i++) {
+            let zaznam = hledVysledek[i];
+            zaznam.addEventListener("click", () => {
+                console.log(zaznam.id)
+                scroll(0,0);
+                document.getElementById("tlacPrecteno").click();
+                
+                inputNazev.value = zaznam.children[0].children[1].children[0].children[0].textContent;
+                inputAutor.value = zaznam.children[0].children[1].children[0].children[1].children[0].textContent;
+                // inputStran.value = ;
+                idGoogle = zaznam.id;
+            })
+        } 
+
     }
 
     //  ------------- Vypis knih - Tabulka ------------- 
