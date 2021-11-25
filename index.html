@@ -30,8 +30,8 @@
         </div>
         
         <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseForm" 
-            role="button" aria-expanded="false" aria-controls="collapseForm">
-            +
+            role="button" id="tlacPridat" aria-expanded="false" aria-controls="collapseForm">
+            ▷ Přidat novou knihu
         </a>
         <div class="collapse" id="collapseForm">
             <div class="new">
@@ -41,10 +41,12 @@
                     <input class="form-control m-1" type="number" id="stran" placeholder="Počet stran (nepovinné)">
                     <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" 
                         role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
-                        Mám přečteno a chci hodnotit
+                        ▷ Mám přečteno a chci hodnotit
                     </a>
                     <div class="collapse" id="collapseOhodnot"> 
-                        <div class="my-rating m-1"></div>
+                        <div class="my-rating m-1">
+                        <!-- <input type="range" id="hvezdy" max="10"> -->
+                        </div>
                         <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
                     </div> <br>
                     <input type="submit" class="submit btn btn-success m-2" value="Uložit knihu do Mojí knihovny">
@@ -53,6 +55,7 @@
                 <div class="vysledek container"></div>
             </div>
         </div>
+        <div id="oznameni"></div>
         
         <h2>Moje knihy</h2>
         
@@ -79,6 +82,7 @@
             <h2 id="detNazev">Detail knihy</h2>
             <a class="close" href="#">&times;</a><br>
             <div id="detObsah" class="d-flex container flex-row justify-content-evenly align-items-start flex-wrap">
+                <img src="img/no_cover_thumb.gif" id="detIMG">
                 <div class="detLeva p-2">
                     Autor:<br>
                     <h3 id="detAutor"></h3>
@@ -86,16 +90,18 @@
                     <h3 id="detStran"></h3>
                     Přidáno:
                     <h6 id="detPridano"></h6>
-                    ID:
+                    Moje ID:
                     <h6 id="detID"></h6>
-                    <button class="btn btn-primary m-1" id="upravKnihu">Upravit</button>
-                    <button class="btn btn-danger m-1" id="smazatKnihu">Smazat</button>
-
+                    Google ID:
+                    <h6 id="detGID"></h6>
+                    
                 </div>
                 <div class="detPrava p-2">
                     <h3 id="detRating">★</h3>
                     <form>
-                    <h6 id="detRecenze"></h6>
+                        <h6 id="detRecenze"></h6>
+                        <button class="btn btn-primary m-1" id="upravKnihu">Upravit</button>
+                        <button class="btn btn-danger m-1" id="smazatKnihu">Smazat knihu</button>
                     </form>
                 </div>
             </div>

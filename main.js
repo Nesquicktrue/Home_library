@@ -33,20 +33,20 @@ let init = function(){
             console.log("Úspěšně přihlášeno");
             mainContainer.style.display = "";
             console.log("Uživatel: " + user.displayName)
+            update(ref(db, ("Users/" + user.uid + "/info")),{
+                jmeno: user.displayName,
+                email: user.email,
+                UID: user.uid,
+                lastLogin: new Date().toISOString().slice(0, 10),
+            });
+            
+            uidLbl.textContent = user.displayName;
         } else {
             mainContainer.style.display = "none";
             console.warn("Nepřihlášen!");
             window.location.replace("login.html");
         }
         
-        update(ref(db, ("Users/" + user.uid + "/info")),{
-            jmeno: user.displayName,
-            email: user.email,
-            UID: user.uid,
-            lastLogin: new Date().toISOString().slice(0, 10),
-        });
-        
-        uidLbl.textContent = user.displayName;
 
 
     //  ------------- DOM + CONST + GLOBAL ------------- 
@@ -59,8 +59,10 @@ let init = function(){
         })
     })
 
+    const tlacPridat = document.getElementById("tlacPridat");
     const inputAutor = document.getElementById("autor");
     const inputNazev = document.getElementById("nazev");
+    const inputStran = document.getElementById("stran");
     const form = document.querySelector("form");
     const table = document.getElementById("myTable");
     const detNazev = document.querySelector("#detNazev");
@@ -97,14 +99,22 @@ let init = function(){
         }
     });
   
-    //  ------------- Hodnocení nové knihy - collapse ------------- 
-    let inputPrecteno = document.getElementById("collapseOhodnot");
+    //  ------------- Tlačítka - Collapse ------------- 
+    const inputNovaKniha = document.getElementById("collapseForm")
+    inputNovaKniha.addEventListener('show.bs.collapse', () => {
+        tlacPridat.textContent = '▽ Přidat novou knihu';
+    }); 
+    inputNovaKniha.addEventListener('hide.bs.collapse', () => {
+        tlacPridat.textContent = '▷ Přidat novou knihu';
+    }); 
+
+    const inputPrecteno = document.getElementById("collapseOhodnot");
     inputPrecteno.addEventListener('show.bs.collapse', rozbalHodnoceni); 
     inputPrecteno.addEventListener('hide.bs.collapse', srolujHodnoceni); 
     
     function rozbalHodnoceni () {
         precteno = true;
-        document.getElementById("tlacPrecteno").textContent = "Nemám přečteno a nechci zatím hodnotit";
+        document.getElementById("tlacPrecteno").textContent = "△ Nemám přečteno a nechci zatím hodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
     };
@@ -112,7 +122,7 @@ let init = function(){
     function srolujHodnoceni () {
         precteno = false;
         $(".my-rating").starRating("setReadOnly");
-        document.getElementById("tlacPrecteno").textContent = "Mám přečteno a chci hodnotit";
+        document.getElementById("tlacPrecteno").textContent = "▷ Mám přečteno a chci hodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
     };
@@ -121,6 +131,11 @@ let init = function(){
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         zjistiID();
+        tlacPridat.click();          // schovat form
+        document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
+        setTimeout(() => {document.getElementById("oznameni").textContent = ""}, 5000);
+        divVysledek.innerHTML = "";                 // vyčistit seznam vyhledávání
+       // inputHodnoceni.starRating('unload');        // resetovat hodnocení
         setTimeout(() => {naplnSeznamKnihzDB()}, 500);
     });
 
@@ -134,9 +149,7 @@ let init = function(){
     }
 
     function posliDoDatabaze (id) {
-        // inputNazev a inputAutor je global kvůlu Google API hledání
-       
-        const inputStran = document.getElementById("stran");
+        // inputNazev, inputAutor a inputStran je global kvůlu Google API hledání
         const inputRecenze = document.getElementById("recenze");
         set(ref(db, ("Users/" + idUser + "/knihy/" + id)),{
             nazevKnihy: inputNazev.value,
@@ -214,7 +227,7 @@ let init = function(){
                         (item.volumeInfo.subtitle) ? 
                             (hledPodtitul= ": " + item.volumeInfo.subtitle) : (hledPodtitul = ""); 
                         (item.volumeInfo.pageCount) ?
-                            (hledStran = ", stran: " + item.volumeInfo.pageCount) :  (hledStran = ", stran: N/A");
+                            (hledStran = item.volumeInfo.pageCount) :  (hledStran = "N/A");
                         (item.volumeInfo.language) ? 
                             ( hledJazyk= ", " + item.volumeInfo.language.toUpperCase()) : (hledPodtitul = "");
 
@@ -228,16 +241,17 @@ let init = function(){
                                                 '<p class="card-text"><span>' +
                                                 item.volumeInfo.authors[0] +
                                                 "</span>, " +
-                                                item.volumeInfo.publishedDate.slice(0,4) +
-                                                hledStran +
+                                                item.volumeInfo.publishedDate.slice(0,4) + ", stran: " +
+                                                "<span>" + hledStran + "</span>" +
                                                 hledJazyk + '</p>' +
                                                 "</div></div></div></div><br>";
                         
                     }
                 }   
             } else {
-                                        divVysledek.innerHTML = "<h6>Kniha nenalezena v Google Knihy</h6>";
+                                        divVysledek.innerHTML = "<h6>Kniha nenalezena na Google Knihy</h6>";
                                     }
+        // Umožňuji vybrat z hledaných výsledků
         const hledVysledek = document.querySelectorAll(".hledVysledek");
         vyberZHledanych(hledVysledek); 
         }),
@@ -252,13 +266,20 @@ let init = function(){
         for (let i=0; i < hledVysledek.length; i++) {
             let zaznam = hledVysledek[i];
             zaznam.addEventListener("click", () => {
-                console.log(zaznam.id)
                 scroll(0,0);
                 document.getElementById("tlacPrecteno").click();
-                
+                let vysStran = zaznam.children[0].children[1].children[0]
+                                .children[1].children[1].textContent;
+
                 inputNazev.value = zaznam.children[0].children[1].children[0].children[0].textContent;
-                inputAutor.value = zaznam.children[0].children[1].children[0].children[1].children[0].textContent;
-                // inputStran.value = ;
+                inputAutor.value = zaznam.children[0].children[1].children[0]
+                                    .children[1].children[0].textContent;
+                if (vysStran > 0) {
+                    inputStran.value = vysStran;
+                } else {
+                    inputStran.value = 0;
+                }
+                ;
                 idGoogle = zaznam.id;
             })
         } 
@@ -321,10 +342,14 @@ let init = function(){
                     detRecenze.textContent = snapshot.val().recenze;
                     detPridano.textContent = snapshot.val().pridano;
                     detID.textContent = snapshot.val().idKnihy;
+                    document.getElementById("detGID").textContent = snapshot.val().idGoogle;
                     detRating.textContent = snapshot.val().rating + "★";
+                    document.getElementById("detIMG").src = "img/no_cover_thumb.gif";
+                    if (snapshot.val().idGoogle) {zjistiObrazek(snapshot.val().idGoogle)};
                 })
             })
-        }   
+        }
+
         tlacUpravKnihu.addEventListener("click", upravDetail);
         tlacSmazKnihu.addEventListener("click", smazKnihu);
     }   
@@ -386,6 +411,16 @@ let init = function(){
         }
     }
 
+    function zjistiObrazek (gid) {
+        fetch("https://www.googleapis.com/books/v1/volumes/" + gid)
+        .then((res) => {return res.json()})
+        .then((response) => {
+            if (response.volumeInfo.imageLinks.thumbnail) {
+                document.getElementById("detIMG").src = response.volumeInfo.imageLinks.thumbnail;
+            }
+        })
+    }
+    
     //  ------------- Filtrování knih v tabulce ------------- 
     
     const inputFilter = document.getElementById("filtr");

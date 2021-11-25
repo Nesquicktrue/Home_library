@@ -27,7 +27,7 @@
   .popDetail {
     margin: 70px auto;
     padding: 20px;
-    
+    max-width: 720px;
     border-radius: 5px; 
     /* width: 60%;
     height: 50%; */
