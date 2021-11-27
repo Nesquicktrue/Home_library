@@ -64,6 +64,8 @@ let init = function(){
     const inputNazev = document.getElementById("nazev");
     const inputStran = document.getElementById("stran");
     const form = document.querySelector("form");
+    const inputHvezdy = document.getElementById("hvezdy");
+    const ratingCislo = document.getElementById("ratingCislo");
     const table = document.getElementById("myTable");
     const detNazev = document.querySelector("#detNazev");
     const detAutor = document.querySelector("#detAutor");
@@ -85,19 +87,6 @@ let init = function(){
     let idGoogle; // po výběru knihy z Google hledání
     let today = new Date().toISOString().slice(0, 10);
 
-    const inputHodnoceni = $(".my-rating").starRating({
-        totalStars: 5,
-        starShape: 'rounded',
-        disableAfterRate: false,
-        starSize: 30,
-        emptyColor: 'lightgray',
-        hoverColor: 'dodgerblue',
-        activeColor: 'green',
-        useGradient: true,
-        callback: function(currentRating, $el){
-            return currentRating*10
-        }
-    });
   
     //  ------------- Tlačítka - Collapse ------------- 
     const inputNovaKniha = document.getElementById("collapseForm")
@@ -121,11 +110,28 @@ let init = function(){
 
     function srolujHodnoceni () {
         precteno = false;
-        $(".my-rating").starRating("setReadOnly");
         document.getElementById("tlacPrecteno").textContent = "▷ Mám přečteno a chci hodnotit";
         document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
         document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
     };
+
+    inputHvezdy.addEventListener("input", ohodnotNovou);
+
+    function ohodnotNovou (){
+        ratingCislo.textContent = inputHvezdy.value / 2 + "★";
+        if (inputHvezdy.value <= 2) {
+            document.getElementById("recenze").textContent = "Ztráta času. Nedoporučuji.";
+        } else if (inputHvezdy.value <= 4) {
+            document.getElementById("recenze").textContent = "Kniha mne nebavila.";
+        } else if (inputHvezdy.value <= 7) {
+            document.getElementById("recenze").textContent = "Průměr, kniha mne bavila.";
+        } else if (inputHvezdy.value <= 9) {
+            document.getElementById("recenze").textContent = "Zážitek! Určitě doporučuji.";
+        } else if (inputHvezdy.value > 9) {
+            document.getElementById("recenze").textContent = "Super zážitek! Kandidát na knihu roku!";
+        }  
+
+    }
 
     // ------------- Přidej knihu ------------- 
     form.addEventListener("submit", (e) => {
@@ -156,7 +162,7 @@ let init = function(){
             autor: inputAutor.value,
             stran: inputStran.value,
             precteno: precteno,
-            rating: inputHodnoceni.starRating('getRating'),
+            rating: ratingCislo.textContent.slice(0,-1),
             recenze: inputRecenze.value,
             pridano: today,
             "idKnihy": id,
@@ -206,6 +212,7 @@ let init = function(){
         let hledPodtitul;
         let hledStran;
         let hledJazyk;
+        let rok;
         fetch("https://www.googleapis.com/books/v1/volumes?q=" 
             + hledanyVyraz + "&printType=books") //&orderBy=newest
         .then(function(res) {
@@ -230,6 +237,8 @@ let init = function(){
                             (hledStran = item.volumeInfo.pageCount) :  (hledStran = "N/A");
                         (item.volumeInfo.language) ? 
                             ( hledJazyk= ", " + item.volumeInfo.language.toUpperCase()) : (hledPodtitul = "");
+                        (item.volumeInfo.publishedDate) ? 
+                            ( rok = item.volumeInfo.publishedDate.slice(0,4)) : (rok = "");
 
                         divVysledek.innerHTML +='<div class="hledVysledek card mb-1" style="max-width: 450px;" id='
                                                 + item.id + '>' + '<div class="row g-0">' + 
@@ -241,7 +250,8 @@ let init = function(){
                                                 '<p class="card-text"><span>' +
                                                 item.volumeInfo.authors[0] +
                                                 "</span>, " +
-                                                item.volumeInfo.publishedDate.slice(0,4) + ", stran: " +
+                                                rok +
+                                                 ", stran: " +
                                                 "<span>" + hledStran + "</span>" +
                                                 hledJazyk + '</p>' +
                                                 "</div></div></div></div><br>";
@@ -360,19 +370,19 @@ let init = function(){
             if (upravovano === 0) {
                 tlacUpravKnihu.textContent = "Uložit změny";    
                 detRating.innerHTML = '<div class="upRating m-1"></div>';
-                $(".upRating").starRating({
-                    totalStars: 5,
-                    starShape: 'rounded',
-                    disableAfterRate: false,
-                    starSize: 30,
-                    emptyColor: 'lightgray',
-                    hoverColor: 'dodgerblue',
-                    activeColor: 'green',
-                    useGradient: true,
-                    callback: function(currentRating, $el){
-                        return currentRating*10
-                    }
-                });
+                // $(".upRating").starRating({
+                //     totalStars: 5,
+                //     starShape: 'rounded',
+                //     disableAfterRate: false,
+                //     starSize: 30,
+                //     emptyColor: 'lightgray',
+                //     hoverColor: 'dodgerblue',
+                //     activeColor: 'green',
+                //     useGradient: true,
+                //     callback: function(currentRating, $el){
+                //         return currentRating*10
+                //     }
+                // });
                 detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="10" >' +
                                         detRecenze.textContent + '</textarea>';
                 upravovano++;
@@ -415,7 +425,7 @@ let init = function(){
         fetch("https://www.googleapis.com/books/v1/volumes/" + gid)
         .then((res) => {return res.json()})
         .then((response) => {
-            if (response.volumeInfo.imageLinks.thumbnail) {
+            if ("imageLinks" in response.volumeInfo) {
                 document.getElementById("detIMG").src = response.volumeInfo.imageLinks.thumbnail;
             }
         })
@@ -452,6 +462,7 @@ let init = function(){
         )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        th.textContent = th.textContent.slice(0, -1)
         const table = th.closest('table');
         const tbody = table.querySelector('tbody');
         let vybrano = document.querySelector(".bg-info"); // přepínání barvy filtrovaného sloupce
@@ -461,8 +472,10 @@ let init = function(){
         .forEach(tr => tbody.appendChild(tr) );
         if (window.asc === true) {
             th.classList.toggle("bg-info");
+            th.textContent += "△";
         } else {
             th.classList.toggle("bg-info");
+            th.textContent += "▽";
         }   
     })));
     
