@@ -92,6 +92,7 @@ let init = function(){
     const inputNovaKniha = document.getElementById("collapseForm")
     inputNovaKniha.addEventListener('show.bs.collapse', () => {
         tlacPridat.textContent = '▽ Přidat novou knihu';
+        document.getElementById("infoHledani").classList.remove("neviditelny");
     }); 
     inputNovaKniha.addEventListener('hide.bs.collapse', () => {
         tlacPridat.textContent = '▷ Přidat novou knihu';
@@ -103,16 +104,18 @@ let init = function(){
     
     function rozbalHodnoceni () {
         precteno = true;
-        document.getElementById("tlacPrecteno").textContent = "△ Nemám přečteno a nechci zatím hodnotit";
-        document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
-        document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
+        document.getElementById("tlacPrecteno").textContent = "△ Nechci knihu nyní hodnotit";
+        document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
+        document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
+        document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
     };
 
     function srolujHodnoceni () {
         precteno = false;
         document.getElementById("tlacPrecteno").textContent = "▷ Mám přečteno a chci hodnotit";
-        document.getElementById("tlacPrecteno").classList.toggle("btn-warning")
-        document.getElementById("tlacPrecteno").classList.toggle("btn-primary")
+        document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
+        document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
+        document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
     };
 
     inputHvezdy.addEventListener("input", ohodnotNovou);
@@ -141,7 +144,6 @@ let init = function(){
         document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
         setTimeout(() => {document.getElementById("oznameni").textContent = ""}, 5000);
         divVysledek.innerHTML = "";                 // vyčistit seznam vyhledávání
-       // inputHodnoceni.starRating('unload');        // resetovat hodnocení
         setTimeout(() => {naplnSeznamKnihzDB()}, 500);
     });
 
@@ -187,6 +189,7 @@ let init = function(){
     function hledejNaGoogleBooks () {
         let hledanyVyraz;
         if (inputNazev.value.length > 3) {
+            document.getElementById("infoHledani").classList.add("neviditelny");
             if ( inputAutor.value ) {
                 hledanyVyraz = "intitle:" + inputNazev.value.replace(/\s+/g, '+');//.toLowerCase()
                 hledanyVyraz += "+inauthor:" + inputAutor.value.replace(/\s+/g, '+');//.toLowerCase();
@@ -196,12 +199,13 @@ let init = function(){
             najdiAVypisZGoogle (hledanyVyraz)
             
         } else {
+            document.getElementById("infoHledani").classList.remove("neviditelny");
             if ( inputAutor.value.length > 3) {
                 hledanyVyraz = "+inauthor:" + inputAutor.value.replace(/\s+/g, '+');
                 najdiAVypisZGoogle (hledanyVyraz)
-            } else {
-                divVysledek.innerHTML = "<h6>Zadejte více jak 3 znaky pro vyhledání v databázy Google Books</h6>";
-            }
+            } 
+            divVysledek.innerHTML =  
+                                        'Zadejte více jak 3 znaky pro vyhledání v databázy Google Books';
         }
           
     }
@@ -369,30 +373,27 @@ let init = function(){
             upravovano %= 2;
             if (upravovano === 0) {
                 tlacUpravKnihu.textContent = "Uložit změny";    
-                detRating.innerHTML = '<div class="upRating m-1"></div>';
-                // $(".upRating").starRating({
-                //     totalStars: 5,
-                //     starShape: 'rounded',
-                //     disableAfterRate: false,
-                //     starSize: 30,
-                //     emptyColor: 'lightgray',
-                //     hoverColor: 'dodgerblue',
-                //     activeColor: 'green',
-                //     useGradient: true,
-                //     callback: function(currentRating, $el){
-                //         return currentRating*10
-                //     }
-                // });
+                detRating.innerHTML = '<div class="container d-flex my-4 gap-2">' +
+                                      '<input type="range" id="detHvezdy" max="10">' +
+                                      '<h2 id="detRatingCislo">2,5 ★</h2>' +
+                                      '</div>';
+                const detInputHvezdy = document.getElementById("detHvezdy");
+                const detRatingCislo = document.getElementById("detRatingCislo");
+                detInputHvezdy.addEventListener("input", () => {
+                    detRatingCislo.textContent = detInputHvezdy.value / 2 + "★";
+                });
                 detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="10" >' +
                                         detRecenze.textContent + '</textarea>';
                 upravovano++;
          } else {
              update(ref(db, ("Users/" + idUser + "/knihy/" + idK)),{
                  precteno: true,
-                 rating: $(".upRating").starRating('getRating'),
+                 rating: detRatingCislo.textContent.slice(0,-1),
                  recenze: document.getElementById("upRecenze").value,
              });
-             detRecenze.innerHTML = '<i class="fas fa-circle-check"></i><font style="color:#198754">Úspěšně uloženo!</font>';
+             detRecenze.innerHTML = '<i class="fas fa-circle-check"></i>' +
+                                '<font style="color:#198754">Úspěšně uloženo!</font>';
+             detRating.innerHTML = "";
              tlacUpravKnihu.textContent = "Upravit";
              upravovano++;
              setTimeout(() => {naplnSeznamKnihzDB()}, 500);

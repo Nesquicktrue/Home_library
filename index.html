@@ -7,9 +7,9 @@
     <title>Knihovnička</title>
     <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-auth.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <!-- <link rel="stylesheet" href="star-rating-svg.css"> -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/js/brands.min.js" ></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/js/solid.min.js" ></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/js/fontawesome.min.js" ></script>
@@ -36,30 +36,63 @@
         <div class="collapse" id="collapseForm">
             <div class="new">
             <form class="form">
-                    <input class="form-control m-1" type="text" id="nazev" placeholder="Název knihy">
-                    <input class="form-control m-1" type="text" id="autor" placeholder="Autor">
-                    <input class="form-control m-1" type="number" id="stran" placeholder="Počet stran (nepovinné)">
+                    <div class="container bg-light rounded-3 my-2 p-2" id="infoHledani">
+                        <div class="d-flex justify-content-start align-items-center">
+                            <i class="fa-solid fa-xl fa-circle-info m-2"></i>
+                            <i>Stránka se pokusí vyhledat knihu v databázi Google jakmile začnete psát její název,
+                                či autora.<br>
+                            Kliknutím na vyhledanou knihu níže můžete její informace převzít. 
+                            <a data-bs-toggle="collapse" href="#collapseInfoHledani" 
+                            role="button" aria-expanded="false" aria-controls="collapseInfoHledani">Více o hledání ▽</a></i><br>
+                        </div>
+                        <div class="collapse m-2" id="collapseInfoHledani">
+                            Vyhledávání probíhá v databázi Google Books a začíná ihned po zadání prvních třech znaků do názvu
+                             knihy. <br>Vyhledávat je možné i dle autora, kdy jeho jméno je možné rovnou psát do názvu 
+                             knihy, nicméně nejpřesnějších výsledků docílíte zadáním přesného názvu knihy a následně
+                             zadání alespoň příjmení autora.<br> Pokud se knihu najít nepodaří, nezoufejte. Knihu je
+                             možné zadat plně ručně pomocí kolonek níže. 
+
+                        </div>
+                    </div>
+                    <i><b>Zadejte údaje o nové knize:</b></i>
+                    <input class="form-control m-1 my-2" type="text" id="nazev" placeholder="Název knihy">
+                    <input class="form-control m-1 my-2" type="text" id="autor" placeholder="Autor">
+                    <input class="form-control m-1 my-2" type="number" id="stran" placeholder="Počet stran (nepovinné)">
                     <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" 
-                        role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
-                        ▷ Mám přečteno a chci hodnotit
-                    </a>
-                    <div class="collapse" id="collapseOhodnot"> 
-                        Vaše hodnocení knihy:
-                        <div class="container d-flex my-4 gap-4 ">
+                    role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
+                    ▷ Mám přečteno a chci hodnotit
+                </a>
+                <div class="collapse" id="collapseOhodnot"> <br>
+                    <i><b>Ohodnoťte knihu: </b></i>
+                    <div class="container d-flex my-2 gap-4 ">
                         <input type="range" id="hvezdy" max="10">
                         <h2 id="ratingCislo">2,5 ★</h2>
-                        </div>
-                        <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
-                    </div> <br>
-                    <input type="submit" class="submit btn btn-success m-2" value="Uložit knihu do Mojí knihovny">
-                </form>
+                    </div>
+                    <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
+                    <div class="container bg-light rounded-3">
+                        <i>
+                        <i class="fa-solid fa-circle-info mx-2"></i>
+                        Text recenze můžete upravit
+                        </i>
+                    </div>
+                </div>
+                <br>
+                <div class="container bg-light rounded-3 mt-4 mb-2" id="infoHodnoceni">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <i class="fa-solid fa-xl fa-circle-info m-2"></i>
+                        <i>Pokud jste knihu již přečetli, můžete ji nyní ohodnit kliknutím na tlačítko výše.<br>
+                        Knihu lze ohodnit i později v jejím detailu.</i>
+                    </div>
+                </div>
+                <input type="submit" class="submit btn btn-success m-2 mt-4" value="Uložit knihu do Mojí knihovny">
+            </form>
                 <br>
                 <div class="vysledek container"></div>
             </div>
         </div>
-        <div id="oznameni"></div>
+        <div id="oznameni" class="my-4 container bg-success border border-dark fs-2 text-white"></div>
         
-        <h2>Moje knihy</h2>
+        <h2 class="mt-4">Moje knihy</h2>
         
         <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora..." >
         <table class="table table-hover table-light m-0">
@@ -85,7 +118,7 @@
             <div id="detObsah" class="container">
                 <div class="row">
                     <div class="imgwrap col-4">
-                        <img src="img/no_cover_thumb.gif" id="detIMG">
+                        <img src="img/no_cover_thumb.gif" width="200" id="detIMG">
                     </div>
                     <div class="detLeva p-2 col-6">
                         Autor:<br>
@@ -114,10 +147,16 @@
     </div>
     
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<hr>
+<div class="container footer d-flex justify-content-center">
+    © 2021 Nesquick, nesquick.true@gmail.com
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<!-- <script src="jquery.star-rating-svg.js"> </script> -->
 <script type="module" src="main.js"></script>
 <script>
 </script>
