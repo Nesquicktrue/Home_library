@@ -12,32 +12,32 @@ firebase.initializeApp(firebaseConfig);
 
 // Přihlašovací dialog pro Firebase
 let uiConfig = {
-    
+
     callbacks: {
         signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-             console.log(authResult)
-             return true;
+            console.log(authResult)
+            return true;
         },
         uiShown: function() {
             document.getElementById('loader').style.display = 'none';
         }
-        },
+    },
     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
     signInFlow: 'popup',
     signInSuccessUrl: 'index.html',
     signInOptions: [
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    //   firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-    //   firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    //   firebase.auth.GithubAuthProvider.PROVIDER_ID,
-    //  firebase.auth.PhoneAuthProvider.PROVIDER_ID
+        firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        //   firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        //   firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        //  firebase.auth.PhoneAuthProvider.PROVIDER_ID
     ],
     // Terms of service url
-    tosUrl: '<your-tos-url>',
+    // tosUrl: '<your-tos-url>',
     // Privacy policy url
-    privacyPolicyUrl: '<your-privacy-policy-url>'
+    // privacyPolicyUrl: '<your-privacy-policy-url>'
 };
 
-let ui = new firebaseui.auth.AuthUI(firebase.auth());  
+let ui = new firebaseui.auth.AuthUI(firebase.auth());
 ui.start('#loginUI', uiConfig)
