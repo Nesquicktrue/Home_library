@@ -106,14 +106,14 @@ let init = function() {
             precteno = true;
             document.getElementById("tlacPrecteno").textContent = "△ Nechci knihu nyní hodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
-            document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
+            document.getElementById("tlacPrecteno").classList.toggle("btn-info");
             // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
         function srolujHodnoceni() {
             precteno = false;
             document.getElementById("tlacPrecteno").textContent = "▷ Ohodnotit";
-            document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
+            document.getElementById("tlacPrecteno").classList.toggle("btn-info");
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
             // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
