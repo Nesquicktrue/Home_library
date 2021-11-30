@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="A.style.css.pagespeed.cf.Qh1-GdQdyh.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -24,7 +25,7 @@
                     <h1 class="heading-section">Domácí Knihovna</h1>
                 </div>
             </div> -->
-            <div class="row justify-content-center">
+            <div class="row justify-content-center" style="min-height: 500px">
                 <div class="col-md-12 col-lg-10">
                     <div class="wrap d-md-flex">
                         <div class="img" style="background-image:url(/Home_library/img/bookshelf.png); ">
@@ -33,16 +34,12 @@
                             <div class="d-flex justify-content-center">
                                 <div class="w-200" style="min-height: 200px;">
                                     <h3>Přihlaste se k Vaší </h3>
-                                    <h1>Domácí knihovně</h1>
+                                    <h3>Domácí knihovně</h3>
                                 </div>
                             </div>
+                            <div id="loginUI" style="margin-top: -50px;"></div>
+                            <div id="loader" class="container">Načítám...</div>
 
-                            <div class="form-group mb-3 m">
-
-                                <div id="loginUI"></div>
-                                <div id="loader" class="container">Načítám...</div>
-
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -50,11 +47,49 @@
         </div>
     </section>
 
-    <div class="container mt-4 footer d-flex justify-content-center">
-        © 2021 Nesquick, nesquick.true@gmail.com
+    <div class="overlay" id="infoPop">
+        <div class="popDetail container m-3 bg-white w-60">
+            <a class="close" href="#">&times;</a><br>
+            <h2 class="pt-2" id="ip">O aplikaci</h2>
+            Vítejte v aplikaci Domácí knihovna ve verzi BETA.<br><br> Jelikož se jedná o první veřejnou verzi, budu moc rád, pokud byste se podělili o Vaše zkušenosti, nápady a připomínky na adresu nesquick.true@gmail.com.
+            <br><br>
+            <h4>Provozní info</h4>
+            Aplikace není nijak zpoplatněna, ani neobsahuje reklamy.<br> Provoz a údržba nicméně něco stojí a pokud se Vám aplikace líbí a používáte ji, budeme rádi pokud zvážíte příspěvěk na provoz a několika měsíční práci s vývojem.
+            <div class="container d-flex justify-content-center">
+                <form action="https://www.paypal.com/donate" method="post" target="_top">
+                    <input type="hidden" name="business" value="W6AHYSSC36CSW" />
+                    <input type="hidden" name="no_recurring" value="0" />
+                    <input type="hidden" name="item_name" value="Domaci knihovna" />
+                    <input type="hidden" name="currency_code" value="CZK" />
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                    <img alt="" border="0" src="https://www.paypal.com/en_CZ/i/scr/pixel.gif" width="1" height="1" />
+                </form>
+            </div>
+            <br>
+            <h4>Ochrana osobních údajů</h4>
+            Všechny osobní informace, které jsou uchovávány v databázi jsou jen ty, které samy poskytnete při prvním přihlášení.<br> Tyto informace jsou uchovávány pouze pro Vás jako uživatele, aby bylo přihlašování snadnější a nejsou námi poskytovány
+            žádné třetí straně, ani automaticky zpracovávány.<br> Od nás Vám nebudou chodit ani žádné emaily.<br> Pokud budete chtít svůj účet zrušit, či údaje vymazat, tak stačí poslat zprávu na nesquick.true@gmail.com.
+            <br><br>
+            <h4>Technologie</h4>
+            <ul>
+                <li>HTML5 / CSS3 / JS</li>
+                <li>JQuery</li>
+                <li>Google Auth, Firebase, Books</li>
+                <li>Bootstrap</li>
+                <li>FontAwesome</li>
+            </ul>
 
+
+
+        </div>
     </div>
 
+    <div class="container footer d-flex justify-content-center align-items-center">
+        <a href="#infoPop" id="OPrg" class="btn btn-sm btn-outline-primary m-2">O programu</a> Domácí knihovna V0.9b<br> © 2021 Nesquick, nesquick.true@gmail.com
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="login.js"></script>
 </body>
 

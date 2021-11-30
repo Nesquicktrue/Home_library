@@ -92,7 +92,7 @@ let init = function() {
         const inputNovaKniha = document.getElementById("collapseForm")
         inputNovaKniha.addEventListener('show.bs.collapse', () => {
             tlacPridat.textContent = '▽ Přidat novou knihu';
-            document.getElementById("infoHledani").classList.remove("neviditelny");
+            // document.getElementById("infoHledani").classList.remove("neviditelny");
         });
         inputNovaKniha.addEventListener('hide.bs.collapse', () => {
             tlacPridat.textContent = '▷ Přidat novou knihu';
@@ -107,21 +107,21 @@ let init = function() {
             document.getElementById("tlacPrecteno").textContent = "△ Nechci knihu nyní hodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
             document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
-            document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
+            // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
         function srolujHodnoceni() {
             precteno = false;
-            document.getElementById("tlacPrecteno").textContent = "▷ Mám přečteno a chci hodnotit";
+            document.getElementById("tlacPrecteno").textContent = "▷ Ohodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-warning");
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
-            document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
+            // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
         inputHvezdy.addEventListener("input", ohodnotNovou);
 
         function ohodnotNovou() {
-            ratingCislo.textContent = inputHvezdy.value / 2 + "★";
+            ratingCislo.textContent = inputHvezdy.value / 2;
             if (inputHvezdy.value <= 2) {
                 document.getElementById("recenze").textContent = "Ztráta času. Nedoporučuji.";
             } else if (inputHvezdy.value <= 4) {
@@ -147,6 +147,8 @@ let init = function() {
             setTimeout(() => { naplnSeznamKnihzDB() }, 500);
         });
 
+
+
         function zjistiID() {
             get(ref(db, "Users/" + idUser + "/info/idKnizek"))
                 .then((snapshot) => {
@@ -164,7 +166,7 @@ let init = function() {
                 autor: inputAutor.value,
                 stran: inputStran.value,
                 precteno: precteno,
-                rating: ratingCislo.textContent.slice(0, -1),
+                rating: ratingCislo.textContent,
                 recenze: inputRecenze.value,
                 pridano: today,
                 "idKnihy": id,
@@ -187,9 +189,10 @@ let init = function() {
         document.getElementById("autor").addEventListener("keyup", hledejNaGoogleBooks)
 
         function hledejNaGoogleBooks() {
+            document.getElementById("infoHledani").classList.add("neviditelny");
             let hledanyVyraz;
-            if (inputNazev.value.length > 3) {
-                document.getElementById("infoHledani").classList.add("neviditelny");
+            if (inputNazev.value.length >= 3) {
+
                 if (inputAutor.value) {
                     hledanyVyraz = "intitle:" + inputNazev.value.replace(/\s+/g, '+'); //.toLowerCase()
                     hledanyVyraz += "+inauthor:" + inputAutor.value.replace(/\s+/g, '+'); //.toLowerCase();
@@ -199,7 +202,6 @@ let init = function() {
                 najdiAVypisZGoogle(hledanyVyraz)
 
             } else {
-                document.getElementById("infoHledani").classList.remove("neviditelny");
                 if (inputAutor.value.length > 3) {
                     hledanyVyraz = "+inauthor:" + inputAutor.value.replace(/\s+/g, '+');
                     najdiAVypisZGoogle(hledanyVyraz)
@@ -229,7 +231,7 @@ let init = function() {
                             // in production code, item.text should have the HTML entities escaped.
                             if (item.volumeInfo.authors) {
                                 if (item.volumeInfo.imageLinks) {
-                                    hledObr = '<img src=' + item.volumeInfo.imageLinks.smallThumbnail +
+                                    hledObr = '<img width="60px" src=' + item.volumeInfo.imageLinks.smallThumbnail +
                                         '" class="img-fluid rounded-start">';
                                 } else {
                                     hledObr = '<img src="./img/no_cover_thumb.gif"' +
@@ -244,9 +246,9 @@ let init = function() {
                                 (item.volumeInfo.publishedDate) ?
                                 (rok = item.volumeInfo.publishedDate.slice(0, 4)) : (rok = "");
 
-                                divVysledek.innerHTML += '<div class="hledVysledek card mb-1" style="max-width: 450px;" id=' +
+                                divVysledek.innerHTML += '<div class="hledVysledek card w-100 mb-1" id=' +
                                     item.id + '>' + '<div class="row g-0">' +
-                                    '<div class="col-md-2">' +
+                                    '<div class="col-md-2" style="width: 70px">' +
                                     hledObr + '</div>' +
                                     '<div class="col-md-8">' + '<div class="card-body">' +
                                     '<h6 class="card-title">' + item.volumeInfo.title +
@@ -359,7 +361,10 @@ let init = function() {
                                 snapshot.val().nazevKnihy.replace(/\s+/g, '+') +
                                 '&whisper_type=&whisper_id=';
                             document.getElementById("detGID").textContent = snapshot.val().idGoogle;
-                            detRating.textContent = snapshot.val().rating + "★";
+                            document.getElementById("detUpravRating").innerHTML =
+                                '<h3 id="detRating" style="width: 3ch;">' +
+                                snapshot.val().rating +
+                                '</h3><h3 class="star">★</h3>';
                             document.getElementById("detIMG").src = "img/no_cover_thumb.gif";
                             if (snapshot.val().idGoogle) { zjistiObrazek(snapshot.val().idGoogle) };
                         })
@@ -371,31 +376,32 @@ let init = function() {
         }
 
         function upravDetail() {
+            console.log(upravovano)
             let idK = detID.textContent;
             upravovano %= 2;
             if (upravovano === 0) {
                 tlacUpravKnihu.textContent = "Uložit změny";
-                detRating.innerHTML = '<div class="container d-flex my-4 gap-2">' +
+                document.getElementById("detUpravRating").innerHTML =
                     '<input type="range" id="detHvezdy" max="10">' +
-                    '<h2 id="detRatingCislo">2,5 ★</h2>' +
-                    '</div>';
+                    '<h3 id="detRatingCislo" style="width:3ch">2,5</h3>' +
+                    '<h3 class="star">★</h3>';
                 const detInputHvezdy = document.getElementById("detHvezdy");
                 const detRatingCislo = document.getElementById("detRatingCislo");
                 detInputHvezdy.addEventListener("input", () => {
-                    detRatingCislo.textContent = detInputHvezdy.value / 2 + "★";
+                    detRatingCislo.textContent = detInputHvezdy.value / 2;
                 });
-                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="10" >' +
+                detRecenze.innerHTML = '<textarea id="upRecenze" class="form-control" rows="3" >' +
                     detRecenze.textContent + '</textarea>';
                 upravovano++;
             } else {
                 update(ref(db, ("Users/" + idUser + "/knihy/" + idK)), {
                     precteno: true,
-                    rating: detRatingCislo.textContent.slice(0, -1),
+                    rating: detRatingCislo.textContent,
                     recenze: document.getElementById("upRecenze").value,
                 });
                 detRecenze.innerHTML = '<i class="fas fa-circle-check"></i>' +
                     '<font style="color:#198754">Úspěšně uloženo!</font>';
-                detRating.innerHTML = "";
+                document.getElementById("detUpravRating").innerHTML = "";
                 tlacUpravKnihu.textContent = "Upravit";
                 upravovano++;
                 setTimeout(() => { naplnSeznamKnihzDB() }, 500);
@@ -464,23 +470,30 @@ let init = function() {
             v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
         )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
-        document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-            th.textContent = th.textContent.slice(0, -1)
-            const table = th.closest('table');
-            const tbody = table.querySelector('tbody');
-            let vybrano = document.querySelector(".vybrano"); // přepínání barvy filtrovaného sloupce
-            vybrano.classList.toggle("vybrano");
-            Array.from(tbody.querySelectorAll('tr'))
-                .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
-                .forEach(tr => tbody.appendChild(tr));
-            if (window.asc === true) {
-                th.classList.toggle("vybrano");
-                th.textContent += "△";
-            } else {
-                th.classList.toggle("vybrano");
-                th.textContent += "▽";
-            }
-        })));
+        document.querySelectorAll('th').forEach(th => {
+            th.addEventListener('click', (() => {
+                document.querySelectorAll('th').forEach(
+                    th => {
+                        th.textContent = th.textContent.replace(/△/i, "");
+                        th.textContent = th.textContent.replace(/▽/i, "");
+                    })
+                const table = th.closest('table');
+                const tbody = table.querySelector('tbody');
+                let vybrano = document.querySelector(".vybrano"); // přepínání barvy filtrovaného sloupce
+                vybrano.classList.toggle("vybrano");
+                Array.from(tbody.querySelectorAll('tr'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+                    .forEach(tr => tbody.appendChild(tr));
+                if (window.asc === true) {
+                    document.getElementById("infoRazeni").classList.add("neviditelny");
+                    th.classList.toggle("vybrano");
+                    th.textContent += "△";
+                } else {
+                    th.classList.toggle("vybrano");
+                    th.textContent += "▽";
+                }
+            }))
+        });
 
     });
 }

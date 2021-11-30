@@ -19,8 +19,9 @@
 <body>
     <div id="main_container" style="display:none;">
         <div class="container hlavni">
+
             <div class="d-flex flex-row-reverse align-items-center bd-highlight mb-3">
-                <button id="logout" class="btn btn-primary ms-2 ">Odhlásit</button>
+                <button id="logout" class="btn btn-sm btn-outline-primary ms-2 ">Odhlásit</button>
                 <div class="d-flex flex-column">
                     <span class="m-0" style="font-size:smaller">Přihlášen:</span>
                     <span id="UID" class="h6 m-0"></span>
@@ -36,51 +37,54 @@
             <div class="collapse" id="collapseForm">
                 <div class="new">
                     <form class="form">
-                        <div class="container rounded-3 my-2 p-2" id="infoHledani">
+                        <div class="container rounded-3 my-2 p-2 info" id="infoHledani">
                             <div class="d-flex justify-content-start align-items-center">
                                 <i class="fa-solid fa-xl fa-circle-info m-2"></i>
-                                <i>Jakmile začnete psát název, či autora, tak se stránka pokusí vyhledat knihu v databázi Google.<br>
+                                <i>Jakmile začnete psát název, či autora, stránka se pokusí vyhledat knihu v databázi Google.<br>
                             Výsledky vyhledávání jsou níže na této stránce.<br>Kliknutím na vyhledanou knihu můžete její informace převzít. 
                             <a data-bs-toggle="collapse" href="#collapseInfoHledani" 
                             role="button" aria-expanded="false" aria-controls="collapseInfoHledani">Více o hledání ▽</a></i><br>
                             </div>
                             <div class="collapse m-2" id="collapseInfoHledani">
-                                Vyhledávání probíhá v databázi Google Books a začíná ihned po zadání prvních třech znaků do názvu knihy. <br>Vyhledávat je možné i dle autora či čísla ISBN. Pokud číslo ISBN neznáte, tak se k nejpřesnějším výsledkům dostanete
-                                zadáním přesného názvu knihy a následně zadání alespoň příjmení autora.<br>Pokud se knihu najít nepodaří, nezoufejte. Knihu je možné zadat plně ručně pomocí kolonek níže.
+                                <i>Vyhledávání probíhá v databázi Google Books a začíná ihned po zadání prvních třech znaků do názvu knihy. <br>Vyhledávat je možné i dle autora či čísla ISBN. Pokud číslo ISBN neznáte, tak se k nejpřesnějším výsledkům dostanete
+                                zadáním přesného názvu knihy a následně zadání alespoň příjmení autora.<br>Pokud se knihu najít nepodaří, nezoufejte. Knihu je možné zadat plně ručně pomocí kolonek níže.</i>
 
                             </div>
                         </div>
                         <i><span><b>Zadejte údaje o nové knize:</b></span></i>
                         <input class="form-control m-1 my-2" type="text" id="nazev" placeholder="Název knihy">
                         <input class="form-control m-1 my-2" type="text" id="autor" placeholder="Autor">
-                        <input class="form-control m-1 my-2" type="number" id="stran" placeholder="Počet stran (nepovinné)">
-                        <a class="btn btn-primary m-2" data-bs-toggle="collapse" href="#collapseOhodnot" role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
-                    ▷ Mám přečteno a chci hodnotit
-                </a>
-                        <div class="collapse" id="collapseOhodnot"> <br>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <input class="form-control m-1 my-2" type="number" id="stran" placeholder="Počet stran (nepovinné)">
+                            <a class="btn btn-primary mx-2" data-bs-toggle="collapse" href="#collapseOhodnot" role="button" aria-expanded="false" aria-controls="collapseOhodnot" id="tlacPrecteno">
+                         ▷ Ohodnotit
+                        </a>
+                        </div>
+                        <div class="collapse" id="collapseOhodnot">
+                            <div class="container rounded-3 mt-2 mb-2 info" id="infoHodnoceni">
+                                <div class="d-flex justify-content-start align-items-center">
+                                    <i class="fa-solid fa-xl fa-circle-info m-2"></i>
+                                    <i>Pokud jste knihu již přečetli, můžete ji nyní ohodnotit.<br>
+            Knihu můžete ohodnotit i později v jejím detailu.</i>
+                                </div>
+                            </div>
                             <i><b>Ohodnoťte knihu: </b></i>
-                            <div class="container d-flex my-2 gap-4 ">
+                            <div class="container d-flex my-2">
                                 <input type="range" id="hvezdy" max="10">
-                                <h2 id="ratingCislo">2,5 ★</h2>
+                                <h2 id="ratingCislo" style="width: 3ch;">2,5</h2>
+                                <h2 class="star">★</h2>
                             </div>
                             <textarea class="form-control" id="recenze" rows="4" cols="50" placeholder="Recenze"></textarea>
-                            <div class="container bg-light rounded-3">
+                            <div class="container rounded-3" id="infoText">
                                 <i>
                         <i class="fa-solid fa-circle-info mx-2"></i> Text recenze můžete upravit
                                 </i>
                             </div>
                         </div>
                         <br>
-                        <div class="container rounded-3 mt-4 mb-2" id="infoHodnoceni">
-                            <div class="d-flex justify-content-start align-items-center">
-                                <i class="fa-solid fa-xl fa-circle-info m-2"></i>
-                                <i>Pokud jste knihu již přečetli, můžete ji nyní ohodnit kliknutím na tlačítko výše.<br>
-                        Knihu lze ohodnit i později v jejím detailu.</i>
-                            </div>
-                        </div>
-                        <input type="submit" class="submit btn btn-success m-2 mt-4" value="Uložit knihu do Mojí knihovny">
+                        <input type="submit" class="submit btn btn-success m-2 " value="Uložit knihu do Mojí knihovny">
                     </form>
-                    <br>
+
                     <div class="vysledek container"></div>
                 </div>
             </div>
@@ -89,6 +93,13 @@
             <h2 class="mt-4">Moje knihy</h2>
 
             <input id="filtr" type="text" class="form-control mb-1 mt-4" placeholder="Hledej název, či autora...">
+            <div class="container rounded-3 mt-2 mb-2 info" id="infoRazeni">
+                <div class="d-flex justify-content-start align-items-center">
+                    <i class="fa-solid fa-xl fa-circle-info m-2"></i>
+                    <i>Vaše knihy lze i seřadit - například abecedně.<br>
+                    Stačí kliknout na název příslušného sloupce.</i>
+                </div>
+            </div>
             <table class="table table-hover m-0">
                 <thead>
                     <th scope="col" style="width: 25%" class="vybrano" data-colname="nazev" data-order="desc">Název knihy </th>
@@ -107,7 +118,7 @@
         <div class="overlay" id="popup">
 
             <div class="popDetail container m-3 bg-white"><br>
-                <h2 id="detNazev">Detail knihy</h2>
+                <h2 class="pt-2" id="detNazev">Detail knihy</h2>
                 <a class="close" href="#">&times;</a><br>
                 <div id="detObsah" class="container">
                     <div class="row">
@@ -123,15 +134,20 @@
                             <h6 id="detPridano"></h6>
                             Moje ID:
                             <h6 id="detID"></h6>
-                            <h6><a href="#" target="_blank" id="detCBDB">
-                            Zobrazit na ČBDB.cz</a>
-                            </h6>
                             Google ID:
                             <h6 id="detGID"></h6>
+                            <h6><a href="#" target="_blank" id="detCBDB">
+                            Hledat na ČBDB.cz</a>
+                            </h6>
                         </div>
                     </div>
                     <div class="detPrava p-2 row col">
-                        <h3 id="detRating">★</h3>
+
+                        <div class="container d-flex my-2" id="detUpravRating">
+                            <h3 id="detRating" style="width: 3ch;">2,5</h3>
+                            <h3 class="star">★</h3>
+                        </div>
+
                         <form>
                             <h6 id="detRecenze"></h6>
                             <button class="btn btn-primary m-1" id="upravKnihu">Upravit</button>
@@ -142,11 +158,47 @@
             </div>
 
         </div>
+        <div class="overlay" id="infoPop">
+            <div class="popDetail container m-3 bg-white w-60">
+                <a class="close" href="#">&times;</a><br>
+                <h2 class="pt-2" id="ip">O aplikaci</h2>
+                Vítejte v aplikaci Domácí knihovna ve verzi BETA.<br><br> Jelikož se jedná o první veřejnou verzi, budu moc rád, pokud byste se podělili o Vaše zkušenosti, nápady a připomínky na adresu nesquick.true@gmail.com.
+                <br><br>
+                <h4>Provozní info</h4>
+                Aplikace není nijak zpoplatněna, ani neobsahuje reklamy.<br> Provoz a údržba nicméně něco stojí a pokud se Vám aplikace líbí a používáte ji, budeme rádi pokud zvážíte příspěvěk na provoz a několika měsíční práci s vývojem.
+                <div class="container d-flex justify-content-center">
+                    <form action="https://www.paypal.com/donate" method="post" target="_top">
+                        <input type="hidden" name="business" value="W6AHYSSC36CSW" />
+                        <input type="hidden" name="no_recurring" value="0" />
+                        <input type="hidden" name="item_name" value="Domaci knihovna" />
+                        <input type="hidden" name="currency_code" value="CZK" />
+                        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                        <img alt="" border="0" src="https://www.paypal.com/en_CZ/i/scr/pixel.gif" width="1" height="1" />
+                    </form>
+                </div>
+                <br>
+                <h4>Ochrana osobních údajů</h4>
+                Všechny osobní informace, které jsou uchovávány v databázi jsou jen ty, které samy poskytnete při prvním přihlášení.<br> Tyto informace jsou uchovávány pouze pro Vás jako uživatele, aby bylo přihlašování snadnější a nejsou námi poskytovány
+                žádné třetí straně, ani automaticky zpracovávány.<br> Od nás Vám nebudou chodit ani žádné emaily.<br> Pokud budete chtít svůj účet zrušit, či údaje vymazat, tak stačí poslat zprávu na nesquick.true@gmail.com.
+                <br><br>
+                <h4>Technologie</h4>
+                <ul>
+                    <li>HTML5 / CSS3 / JS</li>
+                    <li>JQuery</li>
+                    <li>Google Auth, Firebase, Books</li>
+                    <li>Bootstrap</li>
+                    <li>FontAwesome</li>
+                </ul>
+
+
+
+            </div>
+        </div>
 
     </div>
     <hr>
-    <div class="container footer d-flex justify-content-center">
-        © 2021 Nesquick, nesquick.true@gmail.com
+    <div class="container footer d-flex justify-content-center align-items-center">
+        <a href="#infoPop" id="OPrg" class="btn btn-sm btn-outline-primary m-2">O programu</a> Domácí knihovna V0.9b<br> © 2021 Nesquick, nesquick.true@gmail.com
 
     </div>
 
