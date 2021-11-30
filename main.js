@@ -228,7 +228,6 @@ let init = function() {
                     if (response.items) {
                         for (let i = 0; i < response.items.length; i++) {
                             let item = response.items[i];
-                            // in production code, item.text should have the HTML entities escaped.
                             if (item.volumeInfo.authors) {
                                 if (item.volumeInfo.imageLinks) {
                                     hledObr = '<img width="60px" src=' + item.volumeInfo.imageLinks.smallThumbnail +
@@ -376,7 +375,6 @@ let init = function() {
         }
 
         function upravDetail() {
-            console.log(upravovano)
             let idK = detID.textContent;
             upravovano %= 2;
             if (upravovano === 0) {
