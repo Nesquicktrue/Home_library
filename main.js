@@ -62,6 +62,7 @@ let init = function() {
         const inputAutor = document.getElementById("autor");
         const inputNazev = document.getElementById("nazev");
         const inputStran = document.getElementById("stran");
+        const inputISBN = document.getElementById("inputISBN");
         const form = document.querySelector("form");
         const inputHvezdy = document.getElementById("hvezdy");
         const ratingCislo = document.getElementById("ratingCislo");
@@ -77,6 +78,12 @@ let init = function() {
         const tlacUpravKnihu = document.querySelector("#upravKnihu");
         const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const divVysledek = document.querySelector(".vysledek");
+
+        let hledObr; // pro výsledky hledání Google + obalkyknih.cz
+        let hledPodtitul;
+        let hledStran;
+        let hledJazyk;
+        let rok;
 
         let upravovano; // ukádám stav tlačítka pro úpravu hodnocení knihy
         let opravduSmazat; // počet zmáčknutí tlačítka pro smazání knihy
@@ -214,11 +221,7 @@ let init = function() {
 
         function najdiAVypisZGoogle(hledanyVyraz) {
             divVysledek.innerHTML = "<h6>Výsledky hledání na Google Knihy:</h6>";
-            let hledObr;
-            let hledPodtitul;
-            let hledStran;
-            let hledJazyk;
-            let rok;
+
             fetch("https://www.googleapis.com/books/v1/volumes?q=" +
                     hledanyVyraz + "&printType=books") //&orderBy=newest
                 .then(function(res) {
@@ -492,6 +495,74 @@ let init = function() {
                 }
             }))
         });
+        // ------ Scanování
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Handle on success condition with the decoded text or result.
+            console.log(`Scan result: ${decodedText}`, decodedResult);
+            inputISBN.value = decodedText;
+            hledejVAPI(decodedText);
+            html5QrcodeScanner.clear();
+            return decodedText;
+            // ^ this will stop the scanner (video feed) and clear the scan area.
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+
+        const tlacSken = document.getElementById("sken");
+        tlacSken.addEventListener("click", () => {
+            html5QrcodeScanner.render(onScanSuccess);
+        })
+
+        function hledejVAPI(isbn) {
+            fetch("http://cache.obalkyknih.cz/api/books?isbn=" + isbn)
+                .then(function(res) {
+                    return res.json();
+                })
+                .then(function(response) {
+                    if (response) {
+                        for (let i = 0; i < response.length; i++) {
+                            let item = response[i];
+
+                            if (item.cover_preview510_url) {
+                                hledObr = '<img width="60px" src=' + item.cover_preview510_url +
+                                    '" class="img-fluid rounded-start">';
+                            } else {
+                                hledObr = '<img src="./img/no_cover_thumb.gif"' +
+                                    'class="img-fluid rounded-start">';
+                            }
+
+
+                            divVysledek.innerHTML += '<div class="hledVysledek card w-100 mb-1" id=' +
+                                item.ean + '>' + '<div class="row g-0">' +
+                                '<div class="col-md-2" style="width: 70px">' +
+                                hledObr + '</div>' +
+                                '<div class="col-md-8">' + '<div class="card-body">' +
+                                '<h6 class="card-title">' + item.bib_title + '</h6>' +
+                                '<p class="card-text"><span>' +
+                                item.bib_author +
+                                "</span>, " +
+                                ", stran: " +
+                                "<span>" + "</span>" +
+                                '</p>' +
+                                "</div></div></div></div><br>";
+
+
+                        }
+                    } else {
+                        divVysledek.innerHTML = "<h6>Kniha nenalezena dle ISBN zkuste zadat název, případně autora</h6>";
+                    }
+                    // Umožňuji vybrat z hledaných výsledků
+                    const hledVysledek = document.querySelectorAll(".hledVysledek");
+                    vyberZHledanych(hledVysledek);
+                }),
+
+                function(error) {
+                    console.log(error);
+                };
+        }
+
 
     });
 }

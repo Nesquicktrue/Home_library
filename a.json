@@ -1,0 +1,47 @@
+[{
+    "_id": "61a7bada302d8df8f0645c9c",
+    "succ_toc_count": "0",
+    "ext_link": {
+        "databazeknih": {
+            "logo": "https://www.obalkyknih.cz/img/loga/databazeknih.png",
+            "url": "https://www.databazeknih.cz/knihy/ready-player-one-ready-player-one-hra-zacina-290983",
+            "fullname": "Databázeknih.cz"
+        },
+        "cbdb": {
+            "logo": "https://www.obalkyknih.cz/img/loga/logo-cbdb.png",
+            "url": "https://www.cbdb.cz/kniha-58807-ready-player-one-ready-player-one#9788024251745",
+            "fullname": "Československá bibliografická databáze"
+        }
+    },
+    "csn_iso_690": "CLINE, Ernest.  <i>Ready player one: hra začíná. </i>Překlad Naďa FUNIOKOVÁ. Vydání druhé, v EMG první. Praha: Knižní klub, 2016. 423 stran.",
+    "cover_preview510_url": "https://cache.obalkyknih.cz/file/cover/1516904/preview510",
+    "ean": "9788024251745",
+    "rating_avg100": "93",
+    "orig_width": "135",
+    "succ_cover_count": "0",
+    "flag_bare_record": 0,
+    "rating_avg5": "4.7",
+    "csn_iso_690_source": "26.09.2021",
+    "rating_url": "https://www.obalkyknih.cz/stars?value=93",
+    "ean_other": [],
+    "nbn_other": [],
+    "rating_sum": 38212,
+    "rating_count": 410,
+    "cover_thumbnail_url": "https://cache.obalkyknih.cz/file/cover/1516904/thumbnail",
+    "oclc_other": [],
+    "reviews": [],
+    "cover_icon_url": "https://cache.obalkyknih.cz/file/cover/1516904/icon",
+    "bib_year": "2016",
+    "part_root": 1,
+    "orig_height": "210",
+    "bib_title": "Ready Player One",
+    "backlink_url": "https://www.obalkyknih.cz/view?isbn=9788024251745",
+    "succ_bib_count": "0",
+    "book_id": "127348775",
+    "cover_medium_url": "https://cache.obalkyknih.cz/file/cover/1516904/medium",
+    "annotation": {
+        "source": "Web obalkyknih.cz",
+        "html": "Strhující dobrodružný thriller z blízké budoucnosti, světa virtuální reality a počítačových her. Bestseller New York Times je celosvětový mezigenerační čtenářský hit. Vychází ve více než třiceti zemích, v USA prodáno přes milion výtisků. Filmovou adaptaci připravuje režisér Steven Spielberg. Svět v roce 2045 se ocitá v hluboké krizi – jedinou záchranou před bezútěšnou skutečností se pro miliony lidí stalo OASIS, bezplatná onlineová videohra přístupná prakticky každému – každý si zde může vytvořit novou identitu a vést virtuální život, často na hony vzdálený tomu opravdovému: studovat, cestovat, mít přátele, zamilovat se... A nalézt velikonoční vejce, poklad, který tam někde před svou smrtí zanechal James Halliday, výstřední tvůrce OASIS, společně s miliardovým dědictvím.",
+        "id": "2892047"
+    }
+}]

@@ -13,6 +13,10 @@ th {
     text-shadow: 0 0 10px white
 }
 
+.hlavni {
+    max-width: 900px;
+}
+
 .vybrano {
     color: #0d6efd;
 }
