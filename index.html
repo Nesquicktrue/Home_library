@@ -51,9 +51,12 @@
 
                             </div>
                         </div>
-                        <a class="btn btn-primary m-2" id="sken">Naskenovat kód ISBN/EAN</a>
-                        <div style="width: 500px" id="reader"></div>
+                        <a class="btn btn-primary m-2" id="sken" href="#collapseSken" role="button" data-bs-toggle="collapse">Naskenovat kód ISBN/EAN</a>
+                        <div id="collapseSken" class="container collapse">
+                            <div style="width: 500px" id="reader"></div>
+                        </div>
                         <input class="form-control m-1 my-2" type="text" id="inputISBN" placeholder="Čárový kód">
+                        <div class="vysledekISBN container"></div>
                         <i><span><b>Zadejte údaje o nové knize:</b></span></i>
                         <input class="form-control m-1 my-2" type="text" id="nazev" placeholder="Název knihy">
                         <input class="form-control m-1 my-2" type="text" id="autor" placeholder="Autor">

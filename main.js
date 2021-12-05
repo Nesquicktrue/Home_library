@@ -25,7 +25,6 @@ const uidLbl = document.getElementById("UID")
 
 let mainContainer = document.getElementById("main_container");
 
-// --------- Začátek init funkce ---------
 let init = function() {
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
@@ -78,6 +77,7 @@ let init = function() {
         const tlacUpravKnihu = document.querySelector("#upravKnihu");
         const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const divVysledek = document.querySelector(".vysledek");
+        const divVysledekISBN = document.querySelector(".vysledekISBN");
 
         let hledObr; // pro výsledky hledání Google + obalkyknih.cz
         let hledPodtitul;
@@ -92,6 +92,7 @@ let init = function() {
         let precteno = false;
         let idUser = user.uid;
         let idGoogle; // po výběru knihy z Google hledání
+        let kodISBN; // po výběru knihy z Obalky knih.cz
         let today = new Date().toISOString().slice(0, 10);
 
 
@@ -151,6 +152,7 @@ let init = function() {
             document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
             setTimeout(() => { document.getElementById("oznameni").textContent = "" }, 5000);
             divVysledek.innerHTML = ""; // vyčistit seznam vyhledávání
+            divVysledekISBN.innerHTML = "";
             setTimeout(() => { naplnSeznamKnihzDB() }, 500);
         });
 
@@ -177,7 +179,8 @@ let init = function() {
                 recenze: inputRecenze.value,
                 pridano: today,
                 "idKnihy": id,
-                "idGoogle": idGoogle
+                "idGoogle": idGoogle,
+                "ISBN": kodISBN
             });
             update(ref(db, ("Users/" + idUser + "/info")), {
                 "idKnizek": id
@@ -186,7 +189,9 @@ let init = function() {
             inputAutor.value = "";
             inputStran.value = "";
             inputRecenze.value = "";
+            inputISBN.value = "";
             precteno = false;
+
         }
 
 
@@ -260,7 +265,8 @@ let init = function() {
                                     "</span>, " +
                                     rok +
                                     ", stran: " +
-                                    "<span>" + hledStran + "</span>" +
+                                    "<span>" + hledStran + "</span>" + "ID:" + '<span>' +
+                                    item.id + '</span>' + //schováno Google ID
                                     hledJazyk + '</p>' +
                                     "</div></div></div></div><br>";
 
@@ -285,10 +291,20 @@ let init = function() {
                 let zaznam = hledVysledek[i];
                 zaznam.addEventListener("click", () => {
                     scroll(0, 0);
+                    html5QrcodeScanner.clear();
                     document.getElementById("tlacPrecteno").click();
                     let vysStran = zaznam.children[0].children[1].children[0]
                         .children[1].children[1].textContent;
 
+                    if (zaznam.children[0].children[1].children[0]
+                        .children[1].children[2]) {
+
+                        idGoogle = zaznam.children[0].children[1].children[0]
+                            .children[1].children[2].textContent;
+                    } else {
+                        idGoogle = "N/A";
+                    }
+                    kodISBN = inputISBN.value;
                     inputNazev.value = zaznam.children[0].children[1].children[0].children[0].textContent;
                     inputAutor.value = zaznam.children[0].children[1].children[0]
                         .children[1].children[0].textContent;
@@ -297,7 +313,6 @@ let init = function() {
                     } else {
                         inputStran.value = 0;
                     };
-                    idGoogle = zaznam.id;
                 })
             }
 
@@ -524,34 +539,63 @@ let init = function() {
                     if (response) {
                         for (let i = 0; i < response.length; i++) {
                             let item = response[i];
+                            let vypAutor;
+                            let vypStran;
 
-                            if (item.cover_preview510_url) {
-                                hledObr = '<img width="60px" src=' + item.cover_preview510_url +
+                            if (item.cover_medium_url) {
+                                hledObr = '<img  src=' + item.cover_medium_url +
                                     '" class="img-fluid rounded-start">';
                             } else {
                                 hledObr = '<img src="./img/no_cover_thumb.gif"' +
                                     'class="img-fluid rounded-start">';
                             }
+                            if (item.bib_author) {
+                                let arrayJmeno = item.bib_author.split(",");
+                                let prijmeni = arrayJmeno[0].toLowerCase();
+                                prijmeni = prijmeni[0].toUpperCase() + prijmeni.substring(1);
+                                let jmeno = arrayJmeno[1];
+                                vypAutor = jmeno + " " + prijmeni;
+                            } else {
+                                let celeJmeno = item.csn_iso_690.split(".")[0];
+                                let arrayJmeno = celeJmeno.split(",");
+                                let prijmeni = arrayJmeno[0].toLowerCase();
+                                prijmeni = prijmeni[0].toUpperCase() + prijmeni.substring(1);
+                                let jmeno = arrayJmeno[1];
+                                vypAutor = jmeno + " " + prijmeni;
+                            }
 
+                            if (item.bib_pages) {
+                                vypStran = item.bib_pages
+                            } else {
+                                let arrayIso = item.csn_iso_690.split(/[,.]+/);
+                                for (let i = 0; i < arrayIso.length; i++) {
+                                    var hasNumber = /\d/;
+                                    if (arrayIso[i].includes("stran") ||
+                                        (arrayIso[i].includes(" s") && hasNumber.test(arrayIso[i]))) {
+                                        vypStran = arrayIso[i].replace(/[^0-9]/g, '');
+                                    }
+                                }
 
-                            divVysledek.innerHTML += '<div class="hledVysledek card w-100 mb-1" id=' +
+                            }
+
+                            divVysledekISBN.innerHTML += "Dle kódu jsme našli:" + '<div class="hledVysledek card w-100 mb-1" id=' +
                                 item.ean + '>' + '<div class="row g-0">' +
                                 '<div class="col-md-2" style="width: 70px">' +
                                 hledObr + '</div>' +
                                 '<div class="col-md-8">' + '<div class="card-body">' +
                                 '<h6 class="card-title">' + item.bib_title + '</h6>' +
                                 '<p class="card-text"><span>' +
-                                item.bib_author +
+                                vypAutor +
                                 "</span>, " +
                                 ", stran: " +
-                                "<span>" + "</span>" +
+                                "<span>" + vypStran + "</span>" +
                                 '</p>' +
                                 "</div></div></div></div><br>";
 
 
                         }
                     } else {
-                        divVysledek.innerHTML = "<h6>Kniha nenalezena dle ISBN zkuste zadat název, případně autora</h6>";
+                        divVysledekISBN.innerHTML = "<h6>Kniha nenalezena dle ISBN zkuste zadat název, případně autora</h6>";
                     }
                     // Umožňuji vybrat z hledaných výsledků
                     const hledVysledek = document.querySelectorAll(".hledVysledek");
@@ -561,6 +605,7 @@ let init = function() {
                 function(error) {
                     console.log(error);
                 };
+            return;
         }
 
 
