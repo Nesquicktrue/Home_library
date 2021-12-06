@@ -78,7 +78,6 @@ let init = function() {
         const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const divVysledek = document.querySelector(".vysledek");
         const divVysledekISBN = document.querySelector(".vysledekISBN");
-        const divSken = document.getElementById("collapseSken");
         const tlacSken = document.getElementById("sken");
 
         let hledObr; // pro výsledky hledání Google + obalkyknih.cz
@@ -100,11 +99,13 @@ let init = function() {
 
         //  ------------- Tlačítka - Collapse ------------- 
         const inputNovaKniha = document.getElementById("collapseForm")
-        inputNovaKniha.addEventListener('show.bs.collapse', () => {
+        inputNovaKniha.addEventListener('show.bs.collapse', (e) => {
+            e.stopPropagation();
             tlacPridat.textContent = '▽ Přidat novou knihu';
             // document.getElementById("infoHledani").classList.remove("neviditelny");
         });
-        inputNovaKniha.addEventListener('hide.bs.collapse', () => {
+        inputNovaKniha.addEventListener('hide.bs.collapse', (e) => {
+            e.stopPropagation();
             tlacPridat.textContent = '▷ Přidat novou knihu';
         });
 
@@ -112,7 +113,8 @@ let init = function() {
         inputPrecteno.addEventListener('show.bs.collapse', rozbalHodnoceni);
         inputPrecteno.addEventListener('hide.bs.collapse', srolujHodnoceni);
 
-        function rozbalHodnoceni() {
+        function rozbalHodnoceni(e) {
+            e.stopPropagation();
             precteno = true;
             document.getElementById("tlacPrecteno").textContent = "△ Nechci knihu nyní hodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
@@ -120,7 +122,8 @@ let init = function() {
             // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
-        function srolujHodnoceni() {
+        function srolujHodnoceni(e) {
+            e.stopPropagation();
             precteno = false;
             document.getElementById("tlacPrecteno").textContent = "▷ Ohodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-info");
@@ -128,7 +131,7 @@ let init = function() {
             // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
-        inputHvezdy.addEventListener("input", ohodnotNovou);
+        inputHvezdy.addEventListener("input", () => { ohodnotNovou() });
 
         function ohodnotNovou() {
             ratingCislo.textContent = inputHvezdy.value / 2;
@@ -148,14 +151,28 @@ let init = function() {
 
         // ------------- Přidej knihu ------------- 
         form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            zjistiID();
-            tlacPridat.click(); // schovat form
-            document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
-            setTimeout(() => { document.getElementById("oznameni").textContent = "" }, 5000);
-            divVysledek.innerHTML = ""; // vyčistit seznam vyhledávání
-            divVysledekISBN.innerHTML = "";
-            setTimeout(() => { naplnSeznamKnihzDB() }, 500);
+            e.stopPropagation();
+            if (inputNazev.value != "" && inputAutor != "") {
+                e.preventDefault();
+                zjistiID();
+                tlacPridat.click(); // schovat form
+                document.getElementById("oznameni").classList.toggle("bg-succes");
+                document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
+                setTimeout(() => {
+                    document.getElementById("oznameni").textContent = ""
+                    document.getElementById("oznameni").classList.toggle("bg-succes");
+                }, 5000);
+                divVysledek.innerHTML = ""; // vyčistit seznam vyhledávání
+                divVysledekISBN.innerHTML = "";
+                setTimeout(() => { naplnSeznamKnihzDB() }, 500);
+            } else {
+                document.getElementById("oznameni").classList.toggle("bg-warning");
+                document.getElementById("oznameni").textContent = "Zadejte prosím Název knihy a Autora";
+                setTimeout(() => {
+                    document.getElementById("oznameni").textContent = "";
+                    document.getElementById("oznameni").classList.toggle("bg-warning");
+                }, 5000);
+            }
         });
 
 
@@ -172,6 +189,7 @@ let init = function() {
         function posliDoDatabaze(id) {
             // inputNazev, inputAutor a inputStran je global kvůlu Google API hledání
             const inputRecenze = document.getElementById("recenze");
+            if (idGoogle == undefined) { idGoogle = "N/A" }
             set(ref(db, ("Users/" + idUser + "/knihy/" + id)), {
                 nazevKnihy: inputNazev.value,
                 autor: inputAutor.value,
@@ -182,7 +200,7 @@ let init = function() {
                 pridano: today,
                 "idKnihy": id,
                 "idGoogle": idGoogle,
-                "ISBN": kodISBN
+                "ISBN": inputISBN.value
             });
             update(ref(db, ("Users/" + idUser + "/info")), {
                 "idKnizek": id
@@ -294,9 +312,6 @@ let init = function() {
                 zaznam.addEventListener("click", () => {
                     scroll(0, 0);
                     html5QrcodeScanner.clear();
-                    if (skenovaniZobrazeno == true) {
-                        tlacSken.click();
-                    }
                     document.getElementById("infoHledani").classList.add("neviditelny");
                     document.getElementById("tlacPrecteno").click();
                     let vysStran = zaznam.children[0].children[1].children[0]
@@ -522,6 +537,7 @@ let init = function() {
             // Handle on success condition with the decoded text or result.
             console.log(`Naskenováno: ${decodedText}`);
             inputISBN.value = decodedText;
+            document.getElementById("closeSken").click();
             hledejVAPI(decodedText);
             html5QrcodeScanner.clear();
             // ^ this will stop the scanner (video feed) and clear the scan area.
@@ -530,18 +546,9 @@ let init = function() {
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", { fps: 10, qrbox: 250 });
 
-        let skenovaniZobrazeno = false;
-
-        divSken.addEventListener("show.bs.collapse", () => {
+        tlacSken.addEventListener("click", (e) => {
+            e.stopPropagation();
             html5QrcodeScanner.render(onScanSuccess);
-            tlacSken.textContent = "▽ Naskenovat čárový kód";
-            skenovaniZobrazeno = true;
-        })
-        divSken.addEventListener("hide.bs.collapse", () => {
-            // html5QrcodeScanner.stop();
-            html5QrcodeScanner.clear();
-            tlacSken.textContent = "▷ Naskenovat čárový kód";
-            skenovaniZobrazeno = false;
         })
 
         function hledejVAPI(isbn) {

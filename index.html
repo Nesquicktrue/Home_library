@@ -51,10 +51,11 @@
 
                             </div>
                         </div>
-                        <a class="btn btn-primary m-2" id="sken" href="#collapseSken" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseSken">▷ Naskenovat čárový kód</a>
-                        <div id="collapseSken" class="container collapse">
-                            <div style="width: 500px" id="reader"></div>
-                        </div>
+                        <a class="btn btn-primary m-2" id="sken" href="#popSken">Naskenovat čárový kód</a>
+
+
+
+
                         <input class="form-control m-1 my-2" type="text" id="inputISBN" placeholder="Čárový kód">
                         <div class="vysledekISBN container"></div>
                         <i><span><b>Zadejte údaje o nové knize:</b></span></i>
@@ -94,7 +95,7 @@
                     <div class="vysledek container"></div>
                 </div>
             </div>
-            <div id="oznameni" class="my-4 container bg-success border border-dark fs-2 text-white"></div>
+            <div id="oznameni" class="my-4 container border border-dark fs-2 text-white"></div>
 
             <h2 class="mt-4">Moje knihy</h2>
 
@@ -164,6 +165,15 @@
             </div>
 
         </div>
+
+        <div class="overlay" id="popSken">
+            <div class="popDetail container m-3 bg-white w-60" style="height: 500px;">
+                <a class="close" id="closeSken" href="#">&times;</a><br>
+                <h2 class="pt-2">Skenování</h2>
+                <div style="width: 350px" id="reader"></div>
+            </div>
+        </div>
+
         <div class="overlay" id="infoPop">
             <div class="popDetail container m-3 bg-white w-60">
                 <a class="close" href="#">&times;</a><br>
