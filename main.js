@@ -78,6 +78,8 @@ let init = function() {
         const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const divVysledek = document.querySelector(".vysledek");
         const divVysledekISBN = document.querySelector(".vysledekISBN");
+        const divSken = document.getElementById("collapseSken");
+        const tlacSken = document.getElementById("sken");
 
         let hledObr; // pro výsledky hledání Google + obalkyknih.cz
         let hledPodtitul;
@@ -266,7 +268,7 @@ let init = function() {
                                     rok +
                                     ", stran: " +
                                     "<span>" + hledStran + "</span>" + "ID:" + '<span>' +
-                                    item.id + '</span>' + //schováno Google ID
+                                    item.id + '</span>' +
                                     hledJazyk + '</p>' +
                                     "</div></div></div></div><br>";
 
@@ -292,6 +294,10 @@ let init = function() {
                 zaznam.addEventListener("click", () => {
                     scroll(0, 0);
                     html5QrcodeScanner.clear();
+                    if (skenovaniZobrazeno == true) {
+                        tlacSken.click();
+                    }
+                    document.getElementById("infoHledani").classList.add("neviditelny");
                     document.getElementById("tlacPrecteno").click();
                     let vysStran = zaznam.children[0].children[1].children[0]
                         .children[1].children[1].textContent;
@@ -514,20 +520,28 @@ let init = function() {
 
         function onScanSuccess(decodedText, decodedResult) {
             // Handle on success condition with the decoded text or result.
-            console.log(`Scan result: ${decodedText}`, decodedResult);
+            console.log(`Naskenováno: ${decodedText}`);
             inputISBN.value = decodedText;
             hledejVAPI(decodedText);
             html5QrcodeScanner.clear();
-            return decodedText;
             // ^ this will stop the scanner (video feed) and clear the scan area.
         }
 
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", { fps: 10, qrbox: 250 });
 
-        const tlacSken = document.getElementById("sken");
-        tlacSken.addEventListener("click", () => {
+        let skenovaniZobrazeno = false;
+
+        divSken.addEventListener("show.bs.collapse", () => {
             html5QrcodeScanner.render(onScanSuccess);
+            tlacSken.textContent = "▽ Naskenovat čárový kód";
+            skenovaniZobrazeno = true;
+        })
+        divSken.addEventListener("hide.bs.collapse", () => {
+            // html5QrcodeScanner.stop();
+            html5QrcodeScanner.clear();
+            tlacSken.textContent = "▷ Naskenovat čárový kód";
+            skenovaniZobrazeno = false;
         })
 
         function hledejVAPI(isbn) {
