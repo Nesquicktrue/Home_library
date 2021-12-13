@@ -119,7 +119,6 @@ let init = function() {
             document.getElementById("tlacPrecteno").textContent = "△ Nechci knihu nyní hodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
             document.getElementById("tlacPrecteno").classList.toggle("btn-info");
-            // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
         function srolujHodnoceni(e) {
@@ -128,12 +127,11 @@ let init = function() {
             document.getElementById("tlacPrecteno").textContent = "▷ Ohodnotit";
             document.getElementById("tlacPrecteno").classList.toggle("btn-info");
             document.getElementById("tlacPrecteno").classList.toggle("btn-primary");
-            // document.getElementById("infoHodnoceni").classList.toggle("neviditelny");
         };
 
-        inputHvezdy.addEventListener("input", () => { ohodnotNovou() });
+        inputHvezdy.addEventListener("input", dosazujTextRecenze);
 
-        function ohodnotNovou() {
+        function dosazujTextRecenze() {
             ratingCislo.textContent = inputHvezdy.value / 2;
             if (inputHvezdy.value <= 2) {
                 document.getElementById("recenze").textContent = "Ztráta času. Nedoporučuji.";
