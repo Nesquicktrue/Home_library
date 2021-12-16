@@ -19,6 +19,7 @@ import { getDatabase, get, onValue, ref, set, child, update, remove }
 from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
 const db = getDatabase();
 
+// --------- Skenování kódu ---------
 
 // --------- Kontrola přihlášení ---------
 const uidLbl = document.getElementById("UID")
@@ -61,7 +62,7 @@ let init = function() {
         const inputAutor = document.getElementById("autor");
         const inputNazev = document.getElementById("nazev");
         const inputStran = document.getElementById("stran");
-        const inputISBN = document.getElementById("inputISBN");
+        const inputISBN = document.getElementById("scanner_input");
         const form = document.querySelector("form");
         const inputHvezdy = document.getElementById("hvezdy");
         const ratingCislo = document.getElementById("ratingCislo");
@@ -78,7 +79,6 @@ let init = function() {
         const tlacSmazKnihu = document.querySelector("#smazatKnihu");
         const divVysledek = document.querySelector(".vysledek");
         const divVysledekISBN = document.querySelector(".vysledekISBN");
-        const tlacSken = document.getElementById("sken");
 
         let hledObr; // pro výsledky hledání Google + obalkyknih.cz
         let hledPodtitul;
@@ -309,7 +309,6 @@ let init = function() {
                 let zaznam = hledVysledek[i];
                 zaznam.addEventListener("click", () => {
                     scroll(0, 0);
-                    html5QrcodeScanner.clear();
                     document.getElementById("infoHledani").classList.add("neviditelny");
                     document.getElementById("tlacPrecteno").click();
                     let vysStran = zaznam.children[0].children[1].children[0]
@@ -529,25 +528,150 @@ let init = function() {
                 }
             }))
         });
+
         // ------ Scanování
+        $(function() {
+            // Create the QuaggaJS config object for the live stream
+            var liveStreamConfig = {
+                inputStream: {
+                    type: "LiveStream",
+                    constraints: {
+                        width: {
+                            min: 640
+                        },
+                        height: {
+                            min: 480
+                        },
+                        aspectRatio: {
+                            min: 1,
+                            max: 1.7
+                        },
+                        facingMode: "environment" // or "user" for the front camera
+                    }
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: (navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 4),
+                decoder: {
+                    "readers": [{
+                        "format": "ean_reader",
+                        "config": {}
+                    }]
+                },
+                locate: true
+            };
+            // The fallback to the file API requires a different inputStream option. 
+            // The rest is the same 
+            var fileConfig = $.extend({},
+                liveStreamConfig, {
+                    inputStream: {
+                        size: 800
+                    }
+                }
+            );
+            // Start the live stream scanner when the modal opens
+            $('#livestream_scanner').on('shown.bs.modal', function(e) {
+                Quagga.init(
+                    liveStreamConfig,
+                    function(err) {
+                        if (err) {
+                            $('#livestream_scanner .modal-body .error').html('<div class="alert alert-danger"><strong><i class="fa fa-exclamation-triangle"></i> ' + err.name + '</strong>: ' + err.message + '</div>');
+                            Quagga.stop();
+                            return;
+                        }
+                        Quagga.start();
+                    }
+                );
+            });
 
-        function onScanSuccess(decodedText, decodedResult) {
-            // Handle on success condition with the decoded text or result.
-            console.log(`Naskenováno: ${decodedText}`);
-            inputISBN.value = decodedText;
-            document.getElementById("closeSken").click();
-            hledejVAPI(decodedText);
-            html5QrcodeScanner.clear();
-            // ^ this will stop the scanner (video feed) and clear the scan area.
-        }
+            // Make sure, QuaggaJS draws frames an lines around possible 
+            // barcodes on the live stream
+            Quagga.onProcessed(function(result) {
+                var drawingCtx = Quagga.canvas.ctx.overlay,
+                    drawingCanvas = Quagga.canvas.dom.overlay;
 
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
+                if (result) {
+                    if (result.boxes) {
+                        drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                        result.boxes.filter(function(box) {
+                            return box !== result.box;
+                        }).forEach(function(box) {
+                            Quagga.ImageDebug.drawPath(box, {
+                                x: 0,
+                                y: 1
+                            }, drawingCtx, {
+                                color: "green",
+                                lineWidth: 2
+                            });
+                        });
+                    }
 
-        tlacSken.addEventListener("click", (e) => {
-            e.stopPropagation();
-            html5QrcodeScanner.render(onScanSuccess);
-        })
+                    if (result.box) {
+                        Quagga.ImageDebug.drawPath(result.box, {
+                            x: 0,
+                            y: 1
+                        }, drawingCtx, {
+                            color: "#00F",
+                            lineWidth: 2
+                        });
+                    }
+
+                    if (result.codeResult && result.codeResult.code) {
+                        Quagga.ImageDebug.drawPath(result.line, {
+                            x: 'x',
+                            y: 'y'
+                        }, drawingCtx, {
+                            color: 'red',
+                            lineWidth: 3
+                        });
+                    }
+                }
+            });
+
+            // Once a barcode had been read successfully, stop quagga and 
+            // close the modal after a second to let the user notice where 
+            // the barcode had actually been found.
+            Quagga.onDetected(function(result) {
+                if (result.codeResult.code) {
+                    $('#scanner_input').val(result.codeResult.code);
+                    hledejVAPI(result.codeResult.code);
+                    Quagga.stop();
+                    setTimeout(function() {
+                        $('#livestream_scanner').modal('hide');
+                    }, 1000);
+                }
+            });
+
+            // Stop quagga in any case, when the modal is closed
+            $('#livestream_scanner').on('hide.bs.modal', function() {
+                if (Quagga) {
+                    Quagga.stop();
+                }
+            });
+
+            // Call Quagga.decodeSingle() for every file selected in the 
+            // file input
+            $("#livestream_scanner input:file").on("change", function(e) {
+                if (e.target.files && e.target.files.length) {
+                    Quagga.decodeSingle($.extend({}, fileConfig, {
+                        src: URL.createObjectURL(e.target.files[0])
+                    }), function(result) {
+                        alert(result.codeResult.code);
+                    });
+                }
+            });
+        });
+
+        inputISBN.addEventListener("input", () => {
+            if (inputISBN.value.length >= 9) {
+                hledejVAPI(inputISBN.value)
+            }
+        });
+
+
+
 
         function hledejVAPI(isbn) {
             fetch("http://cache.obalkyknih.cz/api/books?isbn=" + isbn)
@@ -619,11 +743,10 @@ let init = function() {
                     // Umožňuji vybrat z hledaných výsledků
                     const hledVysledek = document.querySelectorAll(".hledVysledek");
                     vyberZHledanych(hledVysledek);
-                }),
-
-                function(error) {
+                })
+                .catch(function(error) {
                     console.log(error);
-                };
+                });
             return;
         }
 
