@@ -19,7 +19,6 @@ import { getDatabase, get, onValue, ref, set, child, update, remove }
 from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
 const db = getDatabase();
 
-// --------- Skenování kódu ---------
 
 // --------- Kontrola přihlášení ---------
 const uidLbl = document.getElementById("UID")
@@ -154,26 +153,31 @@ let init = function() {
                 e.preventDefault();
                 zjistiID();
                 tlacPridat.click(); // schovat form
-                document.getElementById("oznameni").classList.toggle("bg-succes");
-                document.getElementById("oznameni").textContent = "✓ Kniha úspěšně uložena";
-                setTimeout(() => {
-                    document.getElementById("oznameni").textContent = ""
-                    document.getElementById("oznameni").classList.toggle("bg-succes");
-                }, 5000);
                 divVysledek.innerHTML = ""; // vyčistit seznam vyhledávání
                 divVysledekISBN.innerHTML = "";
                 setTimeout(() => { naplnSeznamKnihzDB() }, 500);
             } else {
-                document.getElementById("oznameni").classList.toggle("bg-warning");
-                document.getElementById("oznameni").textContent = "Zadejte prosím Název knihy a Autora";
-                setTimeout(() => {
-                    document.getElementById("oznameni").textContent = "";
-                    document.getElementById("oznameni").classList.toggle("bg-warning");
-                }, 5000);
+                zobrazChybovouHlasku("Zadejte prosím Název a Autora")
             }
         });
 
+        function zobrazSpravnouHlasku(hlaska) {
+            document.getElementById("oznameni").classList.toggle("bg-success");
+            document.getElementById("oznameni").textContent = hlaska;
+            setTimeout(() => {
+                document.getElementById("oznameni").textContent = ""
+                document.getElementById("oznameni").classList.toggle("bg-success");
+            }, 5000);
+        }
 
+        function zobrazChybovouHlasku(hlaska) {
+            document.getElementById("oznameni").classList.toggle("bg-warning");
+            document.getElementById("oznameni").textContent = hlaska;
+            setTimeout(() => {
+                document.getElementById("oznameni").textContent = "";
+                document.getElementById("oznameni").classList.toggle("bg-warning");
+            }, 5000);
+        }
 
         function zjistiID() {
             get(ref(db, "Users/" + idUser + "/info/idKnizek"))
@@ -200,7 +204,13 @@ let init = function() {
                 "idKnihy": id,
                 "idGoogle": idGoogle,
                 "ISBN": inputISBN.value
+            })
+            .then (zobrazSpravnouHlasku("✓ Kniha úspěšně uložena"))
+            .catch((e) => {
+                zobrazChybovouHlasku("Něco se nepovedlo, zkuste to prosím později");
+                console.log("Chyba při ukládání: " + e)
             });
+
             update(ref(db, ("Users/" + idUser + "/info")), {
                 "idKnizek": id
             })
@@ -284,7 +294,7 @@ let init = function() {
                                     "</span>, " +
                                     rok +
                                     ", stran: " +
-                                    "<span>" + hledStran + "</span>" + "ID:" + '<span>' +
+                                    "<span>" + hledStran + "</span>" + ", ID:" + '<span>' +
                                     item.id + '</span>' +
                                     hledJazyk + '</p>' +
                                     "</div></div></div></div><br>";
@@ -298,10 +308,7 @@ let init = function() {
                     const hledVysledek = document.querySelectorAll(".hledVysledek");
                     vyberZHledanych(hledVysledek);
                 })
-                .catch(
-                function(error) {
-                    console.log("Chyba hledání na Google books: " + error);
-                });
+                .catch((e) => {console.log("Chyba hledání na Google books: " + e)});
 
         }
 
@@ -352,24 +359,25 @@ let init = function() {
                     })
                     buildTable(knihy)
                 })
-                .catch((e) => console.log("Chyba v načtení seznamu knih z DB: " + e))
+                .catch((e) => {
+                    zobrazChybovouHlasku("Nepovedlo se načíst databázi, zkuste to prosím později.");
+                    console.log("Chyba v načtení seznamu knih z DB: " + e);
+                })
         }
 
         function buildTable(data) {
             table.innerHTML = '';
             for (let i = 0; i < data.length; i++) {
-                // z row prozatím vypuštěno <td>${data[i].recenze}</td> a <td>${data[i].stran}</td>
-                let row = `<tr>
-            <td>${data[i].nazevKnihy}</td>
-            <td>${data[i].autor}</td>
-            
-            <td>${data[i].rating}</td>
-            <td>${data[i].pridano}</td>
-            <td>
-                <a class="btn btn-sm btn-primary tlacInfo" href="#popup" id="${data[i].idKnihy}">
-                <i class="fas fa-pen-to-square"></i></a>
-            </td>
-            </tr>`
+                let row =   `<tr>
+                            <td>${data[i].nazevKnihy}</td>
+                            <td>${data[i].autor}</td>
+                            <td>${data[i].rating}</td>
+                            <td>${data[i].pridano}</td>
+                            <td>
+                                <a class="btn btn-sm btn-primary tlacInfo" href="#popup" id="${data[i].idKnihy}">
+                                <i class="fas fa-pen-to-square"></i></a>
+                            </td>
+                            </tr>`
                 table.innerHTML += row
             }
             vypisDetail();
@@ -398,12 +406,19 @@ let init = function() {
                                 snapshot.val().nazevKnihy.replace(/\s+/g, '+') +
                                 '&whisper_type=&whisper_id=';
                             document.getElementById("detGID").textContent = snapshot.val().idGoogle;
+                            document.getElementById("detISBN").textContent = snapshot.val().ISBN;
                             document.getElementById("detUpravRating").innerHTML =
                                 '<h3 id="detRating" style="width: 3ch;">' +
                                 snapshot.val().rating +
                                 '</h3><h3 class="star">★</h3>';
                             document.getElementById("detIMG").src = "img/no_cover_thumb.gif";
-                            if (snapshot.val().idGoogle) { zjistiObrazek(snapshot.val().idGoogle) };
+                            if (snapshot.val().idGoogle != "N/A") {
+                                 zjistiObrazekZGooglu(snapshot.val().idGoogle)
+                                } else {
+                                    if (snapshot.val().ISBN) {
+                                        zjistiObrazekZAPI(snapshot.val().ISBN)
+                                    }
+                                };
                         })
                 })
             }
@@ -477,15 +492,27 @@ let init = function() {
             }
         }
 
-        function zjistiObrazek(gid) {
+        function zjistiObrazekZGooglu(gid) {
             fetch("https://www.googleapis.com/books/v1/volumes/" + gid)
-                .then((res) => { return res.json() })
+                .then((res) => { return res.json();
+                 })
                 .then((response) => {
                     if ("imageLinks" in response.volumeInfo) {
                         document.getElementById("detIMG").src = response.volumeInfo.imageLinks.thumbnail;
                     }
                 })
                 .catch((e) => {console.log("Chyba načítání obrázku z google:" + e)})
+        }
+
+        function zjistiObrazekZAPI(isbn) {
+            fetch("https://cache.obalkyknih.cz/api/books?isbn=" + isbn)
+            .then(function(res) {
+                return res.json();
+            })
+            .then((response) => {
+                document.getElementById("detIMG").src = response[0].cover_medium_url; 
+            })
+            .catch((e) => {console.log("Chyba načítání obr z API: " + e)})
         }
 
         //  ------------- Filtrování knih v tabulce ------------- 
@@ -543,7 +570,7 @@ let init = function() {
             }))
         });
 
-        // ------ Scanování
+        // --------- Skenování kódu ---------
         $(function() {
             // Create the QuaggaJS config object for the live stream
             var liveStreamConfig = {
@@ -551,10 +578,10 @@ let init = function() {
                     type: "LiveStream",
                     constraints: {
                         width: {
-                            min: 640
+                            min: 1000
                         },
                         height: {
-                            min: 480
+                            min: 720
                         },
                         aspectRatio: {
                             min: 1,
@@ -760,7 +787,7 @@ let init = function() {
                     vyberZHledanych(hledVysledek);
                 })
                 .catch(function(e) {
-                    console.log("Nepovedlo se cist ze server obalkyknih.cz: " + error);
+                    console.log("Nepovedlo se cist ze server obalkyknih.cz: " + e);
                 });
             return;
         }
