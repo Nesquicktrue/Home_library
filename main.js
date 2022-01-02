@@ -688,7 +688,7 @@ let init = function() {
 
 
         function hledejVAPI(isbn) {
-            fetch("http://cache.obalkyknih.cz/api/books?isbn=" + isbn)
+            fetch("https://cache.obalkyknih.cz/api/books?isbn=" + isbn)
                 .then(function(res) {
                     return res.json();
                 })
