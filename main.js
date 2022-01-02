@@ -182,6 +182,7 @@ let init = function() {
                     ++idKnihy;
                     posliDoDatabaze(idKnihy)
                 })
+                .catch((e) => {console.log("Chyba zjišťování posledního ID: " + e)})
         }
 
         function posliDoDatabaze(id) {
@@ -296,11 +297,11 @@ let init = function() {
                     // Umožňuji vybrat z hledaných výsledků
                     const hledVysledek = document.querySelectorAll(".hledVysledek");
                     vyberZHledanych(hledVysledek);
-                }),
-
+                })
+                .catch(
                 function(error) {
-                    console.log(error);
-                };
+                    console.log("Chyba hledání na Google books: " + error);
+                });
 
         }
 
@@ -351,6 +352,7 @@ let init = function() {
                     })
                     buildTable(knihy)
                 })
+                .catch((e) => console.log("Chyba v načtení seznamu knih z DB: " + e))
         }
 
         function buildTable(data) {
@@ -432,13 +434,24 @@ let init = function() {
                     precteno: true,
                     rating: detRatingCislo.textContent,
                     recenze: document.getElementById("upRecenze").value,
-                });
-                detRecenze.innerHTML = '<i class="fas fa-circle-check"></i>' +
-                    '<font style="color:#198754">Úspěšně uloženo!</font>';
-                document.getElementById("detUpravRating").innerHTML = "";
-                tlacUpravKnihu.textContent = "Upravit";
-                upravovano++;
-                setTimeout(() => { naplnSeznamKnihzDB() }, 500);
+                })
+                .then((ok) => {
+                    detRecenze.innerHTML = '<i class="fas fa-circle-check"></i>' +
+                        '<font style="color:#198754">Úspěšně uloženo!</font>';
+                    document.getElementById("detUpravRating").innerHTML = "";
+                    tlacUpravKnihu.textContent = "Upravit";
+                    upravovano++;
+                    naplnSeznamKnihzDB();
+                })
+                .catch(
+                    (e) => {
+                        detRecenze.innerHTML = '<i class="fas fa-circle-check"></i>' +
+                            '<font style="color:#198754">Chyba! Zkuste to prosím znovu.</font>';
+                        document.getElementById("detUpravRating").innerHTML = "";
+                        tlacUpravKnihu.textContent = "Upravit";
+                        upravovano++;
+                    }
+                )
             }
         }
 
@@ -721,7 +734,8 @@ let init = function() {
 
                             }
 
-                            divVysledekISBN.innerHTML += "Dle kódu jsme našli:" + '<div class="hledVysledek card w-100 mb-1" id=' +
+                            divVysledekISBN.innerHTML += "Dle kódu jsme našli:" + 
+                                '<div class="hledVysledek card w-100 mb-1" id=' +
                                 item.ean + '>' + '<div class="row g-0">' +
                                 '<div class="col-md-2" style="width: 70px">' +
                                 hledObr + '</div>' +
