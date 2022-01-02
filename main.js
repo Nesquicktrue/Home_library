@@ -485,6 +485,7 @@ let init = function() {
                         document.getElementById("detIMG").src = response.volumeInfo.imageLinks.thumbnail;
                     }
                 })
+                .catch((e) => {console.log("Chyba načítání obrázku z google:" + e)})
         }
 
         //  ------------- Filtrování knih v tabulce ------------- 
@@ -758,8 +759,8 @@ let init = function() {
                     const hledVysledek = document.querySelectorAll(".hledVysledek");
                     vyberZHledanych(hledVysledek);
                 })
-                .catch(function(error) {
-                    console.log(error);
+                .catch(function(e) {
+                    console.log("Nepovedlo se cist ze server obalkyknih.cz: " + error);
                 });
             return;
         }
